@@ -1,0 +1,3 @@
+git+https://github.com/gregorynicholas/paver.git#egg=paver==1.2.1
+pyyaml==3.10
+jinja2==2.6

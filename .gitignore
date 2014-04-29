@@ -1,0 +1,116 @@
+# build and release folders
+bin/
+bin-debug/
+bin-release/
+
+# other files and folders
+.settings/
+
+
+*.py[cod]
+# C extensions
+*.so
+
+
+# python packages
+*.egg
+*.egg-info
+dist
+eggs
+parts
+bin
+var
+sdist
+develop-eggs
+.installed.cfg
+
+
+# mac os files
+.DS_Store
+
+
+# installer logs
+pip-log.txt
+
+
+# unit test / coverage reports
+.coverage
+nosetests.xml
+app/tests/casperjs/build/
+
+
+# translations
+*.mo
+
+
+# mr developer
+.project
+.pydevproject
+
+
+# pycharm configuration
+.idea
+
+
+# build output
+.build
+.dist
+.data
+.lint
+.pip
+
+
+# daemon pid files
+*.pid
+*.pid.err
+*.pid.out
+
+
+# app engine descriptor build output
+app.yaml
+backends.yaml
+cron.yaml
+dos.yaml
+endpoints.yaml
+index.yaml
+queue.yaml
+
+app/web/static
+app/web/templates
+
+
+# library symlinks required for gae
+lib/wtforms
+lib/wtforms_json
+lib/werkzeug
+lib/simplekv
+lib/pymongo
+lib/mongoengine
+lib/itsdangerous.py
+lib/gridfs
+lib/flaskext
+lib/flask_wtf
+lib/flask_mongoengine
+lib/flask_csv.py
+lib/flask_login.py
+lib/flask_oauth.py
+lib/flask_telegram.py
+lib/flask_telegram_gaemail.py
+lib/flask_telegram_tests.py
+lib/flask
+lib/raven
+lib/sendgrid
+lib/bson
+lib/blinker
+
+
+# node build output
+npm-debug.log
+node_modules
+
+
+# project specific sensitive items
+secret_keys.py
+build/project.yaml
+
+*google-api-python-client*
