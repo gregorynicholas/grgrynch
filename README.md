@@ -1,22 +1,23 @@
 grgrynch
 ========
 
-source code for [gregorynicholas.com](http://gregorynicholas.com) (a google
-appengine app).
+source code for [gregorynicholas.com](http://gregorynicholas.com)
+(a google appengine app).
 
 <br />
 
 -----
 
-* [INSTALL.md](docs/INSTALL.md)
-* [QUICKSTART.md](docs/QUICKSTART.md)
+* i: [INSTALL.md](docs/INSTALL.md)
+* ii: [QUICKSTART.md](docs/QUICKSTART.md)
+* iii: [CLIENT.md](docs/CLIENT.md)
 
 -----
 
 <br />
 
-quick'n'dirty shell install script:
 
+quick'n'dirty shell install commands:
 
     $ mkvirtualenv --no-site-packages grgrynch
     $ pip install -r requirements.txt
