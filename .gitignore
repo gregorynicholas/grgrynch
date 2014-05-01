@@ -97,6 +97,7 @@ lib/flask_oauth.py
 lib/flask_telegram.py
 lib/flask_telegram_gaemail.py
 lib/flask_telegram_tests.py
+lib/flask_funktional*
 lib/flask
 lib/raven
 lib/sendgrid
