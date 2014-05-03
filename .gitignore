@@ -118,3 +118,5 @@ supervisord.conf
 supervisord.log
 
 *google-api-python-client*
+
+/logs/*
