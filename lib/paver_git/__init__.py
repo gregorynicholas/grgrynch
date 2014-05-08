@@ -45,8 +45,9 @@ def tags():
 
 def current_branch():
   """
-  returns the latest version number from git tags.
+  returns the current git branch.
   """
+  # parse HEAD in case the `git branch` command output is modified by user
   value = sh(
     "git rev-parse --abbrev-ref HEAD",
     capture=True, cwd=opts.proj.dirs.base).splitlines()[0]

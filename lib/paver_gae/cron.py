@@ -5,7 +5,7 @@
   paver extension to automate app engine.
 
 
-  :copyright: (c) 2014 by gregorynicholas.
+  :copyright: (c) 2013 by gregorynicholas.
   :license: MIT, see LICENSE for more details.
 """
 from __future__ import unicode_literals
@@ -17,14 +17,18 @@ from paver.ext.gae import descriptor
 __all__ = ["crons"]
 
 
-def get_crons():
+def _cron_descriptor(build_target=opts.proj.dirs.base):
   """
-    :returns: list of Bunch objects for each descriptor config.
+  returns cron job descriptor.
   """
-  return descriptor.cron(opts.proj.dirs.dist)
+  return descriptor.cron(build_target)
 
 
 @task
 def crons():
-  # todo: yaml dump
-  print get_crons()
+  """
+  displays cron jobs configured.
+  """
+  # TODO: generate yaml rendering.
+  cron_descriptor = _cron_descriptor()
+  print 'cron_descriptor:', cron_descriptor

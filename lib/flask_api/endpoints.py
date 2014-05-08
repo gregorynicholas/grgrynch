@@ -20,7 +20,7 @@ __all__ = [
   "form_endpoint",
 ]
 
-logger = getLogger(__name__)
+log = getLogger(__name__)
 
 
 class Endpoints(Blueprint):
@@ -72,7 +72,7 @@ def register(endpoints_blueprint, url_prefix, subdomains=None):
         blueprint=endpoints_blueprint,
         url_prefix=url_prefix,
         subdomain=subdomain))
-      logger.info("appending the subdomain-based blueprint: %s", rv)
+      # log.info("appending the subdomain-based blueprint: %s", rv)
 
   else:
     # register the api blueprint sans subdomain
@@ -80,7 +80,7 @@ def register(endpoints_blueprint, url_prefix, subdomains=None):
     rv.append(dict(
       blueprint=endpoints_blueprint,
       url_prefix=url_prefix))
-    logger.info("appending the sans-subdomain blueprint: %s", rv)
+    # log.info("appending the sans-subdomain blueprint: %s", rv)
 
   return rv
 

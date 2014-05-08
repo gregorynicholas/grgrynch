@@ -25,12 +25,12 @@ from paver.ext.gae.cron import *
 from paver.ext.gae.dos import *
 from paver.ext.gae.index import *
 from paver.ext.gae.queue import *
+from paver.ext.gae.sdk import *
 
 
 __all__ = [
   "appcfg", "install_runtime_libs", "build_descriptors", "fix_gae_sdk_path",
   "verify_serving", "ServerStartFailure",
-  "install_sdk", "install_mapreduce_lib",
   "datastore_init", "open_admin",
   "server_run", "server_stop", "server_restart", "server_tail",
   "deploy", "deploy_branch", "update_indexes",
@@ -77,12 +77,24 @@ def build_descriptors(dest, env_id, ver_id=None):
   if ver_id is None:
     ver_id = release.dist_version_id()
 
+  module_id = None
+
+  inbound_services = []
+  if env_id in ('prod', 'integration'):
+    # on local machine, warmup seems to be called in a continuous poll..
+    inbound_services.append('warmup')
+
   context = dict(
     app_id=opts.proj.app_id,
     env_id=env_id,
     ver_id=ver_id,
+    module_id=module_id,
     templates_dir=str(opts.proj.dirs.app_web_templates.relpath()),
-    static_dir=str(opts.proj.dirs.app_web_static.relpath()))
+    static_dir=str(opts.proj.dirs.app_web_static.relpath()),
+    inbound_services=inbound_services,
+    runtime='python27',
+    api_version=1,
+  )
 
   _render_jinjaenv(_load_descriptors(), context, dest)
 
@@ -171,74 +183,6 @@ def install_runtime_libs(packages, dest):
     # todo: check for missing `__init__.py`
     # check = dest / f.name / '__init__.py'
     # if not check.exists():
-
-
-@task
-def install_sdk():
-  """
-  installs the app engine sdk to the virtualenv.
-  """
-  # todo: add a "force" option to override cache
-  archive = path(opts.gae.dev_appserver.ver + ".zip")
-  if not (opts.proj.dirs.venv / archive).exists():
-    http.wget(
-      opts.gae.dev_appserver.src + archive.name, opts.proj.dirs.venv)
-
-  rm(opts.gae.sdk.root)
-  sh(
-    """
-    unzip -d ./ -oq {archive} && mv ./google_appengine {sdk_root}
-    """,
-    archive=archive.name,
-    sdk_root=opts.gae.sdk.root,
-    cwd=opts.proj.dirs.venv,
-    err=True)
-
-  if not opts.gae.sdk.root.exists():
-    raise BuildFailure("shit didn't download + extract the lib properly.")
-
-  # integrate the app engine sdk with virtualenv
-  pth_path = opts.proj.dirs.venv / "lib/python2.7/site-packages/gaesdk.pth"
-  pth_path.write_lines([
-    opts.gae.sdk.root.abspath(),
-    "import dev_appserver",
-    "dev_appserver.fix_sys_path()"])
-
-  # use virtualenv hooks to add gae's sdk to the exec path
-  postactivate = opts.proj.dirs.venv / "bin/postactivate"
-  postactivate.write_lines([
-    "#!/usr/bin/env bash",
-    "echo \"exec path adjusted for google_appengine_1.8.9\"",
-    "export PATH=\"{}\":$PATH".format(opts.gae.sdk.root)])
-
-
-@task
-def install_mapreduce_lib():
-  """
-  installs google app engine's mapreduce library.
-  (http://github.com/gregorynicholas/appengine-mapreduce)
-  """
-  if (opts.proj.dirs.lib / "mapreduce.zip").exists():
-    return
-  print "installing app engine mapreduce libraries.."
-
-  rm(opts.proj.dirs.lib / "appengine-mapreduce-master")
-  rm(opts.proj.dirs.lib / "mapreduce")
-  rm(opts.proj.dirs.lib / "appengine_pipeline")
-
-  if not (opts.proj.dirs.lib / "master.tar.gz").exists():
-    http.wget("https://github.com/gregorynicholas/appengine-mapreduce/"
-              "archive/master.tar.gz", opts.proj.dirs.lib)
-
-  archives.extract("master.tar.gz", opts.proj.dirs.lib)
-
-  (opts.proj.dirs.lib / "appengine-mapreduce-master/mapreduce"
-   ).move(opts.proj.dirs.lib)
-
-  (opts.proj.dirs.lib / "appengine-mapreduce-master/appengine_pipeline"
-   ).move(opts.proj.dirs.lib)
-
-  rm(opts.proj.dirs.lib / "appengine-mapreduce-master")
 
 
 @task
@@ -331,7 +275,7 @@ def server_run(options):
   env_id = options.get("env_id", opts.proj.envs.local)
   ver_id = release.dist_version_id()
   config_id = options.get("config_id", "default")
-  # pid = opts.proj.dirs.gae.dev_appserver_pid
+
   # if supervisor.is_pid_running(pid):
   #   raise ServerStartFailure("app engine sdk server is already running..")
 
@@ -342,11 +286,13 @@ def server_run(options):
     dev_appserver_command=dev_appserver_command,
     app_id=opts.proj.app_id,
     env_id=env_id,
-    ver_id=ver_id)
-  template = opts.proj.dirs.buildconfig / 'supervisord.template.conf'
+    ver_id=ver_id,
+    stdout=_stdout_path(),
+  )
+  template = (opts.proj.dirs.buildconfig / 'supervisord.template.conf').text()
 
   jinjaenv = Environment(loader=DictLoader(
-    {'supervisord.template.conf': str(template.text())}
+    {'supervisord.template.conf': str(template)}
   ))
 
   _render_jinjaenv(jinjaenv, context, opts.proj.dirs.base)
@@ -382,13 +328,22 @@ def server_restart(options):
   server_run(options)
 
 
+def _stdout_path():
+  """
+  returns a path instance to the stdout log path.
+  """
+  stdout = opts.proj.dirs.logs / "app.log"
+  # if not stdout.exists():
+  #   sh("touch {}".format(stdout), quiet=True)
+  return stdout
+
+
 @task
 def server_tail():
   """
   view the dev_appserver logs by running the unix native "tail" command.
   """
-  stdout = path("{}.out".format(opts.proj.dirs.gae.dev_appserver_pid.name))
-  sh("tail -f {pid}", pid=stdout)
+  print sh("tail -f {stdout}", stdout=_stdout_path(), capture=True)
 
 
 @task

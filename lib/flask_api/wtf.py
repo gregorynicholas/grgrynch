@@ -19,7 +19,7 @@ from pprint import pformat
 from flask.ext.api.exceptions import FieldValidationError
 
 __all__ = ["form_endpoint"]
-logger = getLogger(__name__)
+log = getLogger(__name__)
 
 
 def form_endpoint(form_class, blacklist_methods=["DELETE"]):
@@ -41,10 +41,10 @@ def form_endpoint(form_class, blacklist_methods=["DELETE"]):
           {}, message="method not allowed on endpoint.")
 
       if not form.validate_on_submit():
-        # logger.warning("form validation errors: %s", form.errors)
+        # log.warning("form validation errors: %s", form.errors)
         errors, etype = _format_errors(form.errors)
 
-        # logger.warning("error validating json data: %s, %s", errors, etype)
+        # log.warning("error validating json data: %s, %s", errors, etype)
         raise FieldValidationError(
           errors, message="validation error occurred.")
 

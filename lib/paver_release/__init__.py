@@ -2,7 +2,7 @@
   paver.ext.release
   ~~~~~~~~~~~~~~~~~
 
-  paver extension for releasing + deployments.
+  paver extension for dist builds + releasing.
 
 
   :copyright: (c) 2014 by gregorynicholas.
@@ -19,7 +19,7 @@ __all__ = ["version_tag_id", "dist_version_id"]
 
 def version_tag_id():
   """
-    :returns: string version number of the newest git tag
+  returns a semantic version string of the most recently created git tag.
   """
   tags = git.tags()
   if len(tags) < 1:
@@ -31,10 +31,11 @@ def version_tag_id():
 
 def dist_version_id():
   """
-  gets the version number from git, and modifies to convert from float string
+  returns the dist build version id.
+  generates from git, and modifies to convert from float string
   to a string, so it can be used as part of a subdomain.
 
-    :returns: string
+    :returns: string version id
   """
   rv = git.current_branch()
   # todo: move this list to project.yaml

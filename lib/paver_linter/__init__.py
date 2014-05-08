@@ -2,13 +2,13 @@
   paver.ext.linter
   ~~~~~~~~~~~~~~~~
 
-  paver extension to automate linting.
-
+  paver extension for linting + static analysis.
 
   happily sourced from:
   github.com/shazow/workerpool/blob/master/check.py
 
-  :copyright: (c) 2013 by gregorynicholas.
+
+  :copyright: (c) 2014 by gregorynicholas.
   :license: MIT, see LICENSE for more details.
 """
 from __future__ import unicode_literals
