@@ -112,6 +112,7 @@ node_modules
 
 # project specific sensitive items
 secret_keys.py
+keys.py
 build/project.yaml
 
 supervisord.conf
@@ -120,3 +121,4 @@ supervisord.log
 *google-api-python-client*
 
 /logs/*
+
