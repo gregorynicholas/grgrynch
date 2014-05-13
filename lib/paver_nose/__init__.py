@@ -22,13 +22,12 @@ def run(path, config, mode, env_id):
     :param env_id:
   """
   # set environment variables inline with the command
-  env_vars = "ENV_ID={env_id} NOSE_MODE={mode} ".format(
-    mode=mode,
-    env_id="test")
+  env_vars = "ENV_ID={} NOSE_MODE={} ".format(
+    mode, "test")
 
-  cmd = "{env_vars} "
-  "nosetests -c {config}/nose-{mode}.cfg "
-  "{path}"
+  cmd = "{env_vars} " \
+        "nosetests -c {config}/nose-{mode}.cfg " \
+        "{path}"
 
   # print 'COMMAND:', cmd
 
@@ -40,4 +39,4 @@ def run(path, config, mode, env_id):
     env_id="test",
     path=path,
     error=True,
-    capture=False)
+    capture=True)
