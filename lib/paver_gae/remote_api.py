@@ -9,8 +9,11 @@
   :license: MIT, see LICENSE for more details.
 """
 from __future__ import unicode_literals
+from paver.easy import call_task
+from paver.ext.project import opts
 
-__all__ = ["connect"]
+
+__all__ = ["remote"]
 
 
 DEFAULT_APP_PARTITION = "s"
@@ -20,7 +23,7 @@ DEFAULT_ENDPOINT_PATH = "/_ah/remote_api"
 DEFAULT_ENV_ID = "local"
 
 
-def connect(app_id, path, host, email=None, password=None):
+def _connect(app_id, path, host, email=None, password=None):
   """
   attaches the datastore service stubs to the `app_id` instance at `host`.
   prompts for user's `email` and `password` on connection if they are `None`.
@@ -76,3 +79,50 @@ def connect(app_id, path, host, email=None, password=None):
 
   # remote_api_stub.MaybeInvokeAuthentication()
   environ["SERVER_SOFTWARE"] = "Development (remote_api)/1"
+
+
+def _dev_appserver(env_id):
+  """
+  """
+  res = opts.proj.dev_appserver[env_id]
+  res.hostname = "{}:{}".format(res.host, res.port)
+  return res
+
+
+def fix_gae_sdk_path():
+  """
+  hack to load the app engine sdk into the python path.
+  """
+  import dev_appserver
+  dev_appserver.fix_sys_path()
+
+
+def remote(options):
+  """
+  attaches the shell to an app engine remote_api endpoint.
+  """
+  env_id = options.get("env_id", opts.proj.envs.local)
+  dev_appserver = _dev_appserver(env_id)
+
+  partition = options.get("partition", dev_appserver.partition)
+  app_name = options.get("app_name", DEFAULT_APP_NAME)
+  host = options.get("host", DEFAULT_HOST_NAME)
+  path = options.get("path", DEFAULT_ENDPOINT_PATH)
+  email = options.get("email")
+  password = options.get("password")
+
+  if env_id == opts.proj.envs.local:
+    verify_serving(host)
+    partition = "dev"
+
+  if email is None and host != DEFAULT_HOST_NAME:
+    email = opts.proj.email
+    password = opts.proj.password
+
+  fix_gae_sdk_path()
+
+  print "connecting to remote_api: ", env_id, host, email, password
+
+  _connect(
+    "{}~{}-{}".format(partition, app_name, env_id),
+    path=path, host=host, email=email, password=password)

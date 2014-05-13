@@ -2,16 +2,23 @@
   paver.ext.gae.descriptor
   ~~~~~~~~~~~~~~~~~~~~~~~~
 
-  paver extension to automate app engine.
+  paver extension to work with app engine config yaml descriptors.
 
 
   :copyright: (c) 2014 by gregorynicholas.
   :license: MIT, see LICENSE for more details.
 """
 from __future__ import unicode_literals
+from jinja2 import Environment
+from jinja2.loaders import DictLoader
 from paver.easy import Bunch
 from paver.easy import BuildFailure
+from paver.ext import release
 from paver.ext import utils
+from paver.ext.project import opts
+
+
+__all__ = ['build_descriptors', 'render_jinjaenv']
 
 
 class DESCRIPTORS(object):
@@ -33,7 +40,7 @@ class DescriptorNotFound(BuildFailure):
 
 def load(path, descriptor):
   """
-    :returns: the parsed yaml for the backends descriptor.
+  returns a `Bunch`d yaml for the specified descriptor.
   """
   f = path / '{}.yaml'.format(descriptor)
   if not f.exists():
@@ -53,3 +60,79 @@ m = sys.modules[__name__]
 for name in [_ for _ in dir(DESCRIPTORS) if not _.startswith("_")]:
   fn = lambda path, name=name: load(path, DESCRIPTORS.__dict__.get(name))
   setattr(m, name, fn)
+
+
+# descriptor utils.
+# -----------------------------------------------------------------------------
+
+def render_jinjaenv(jinjaenv, context, dest):
+  """
+  renders all templates in the specified `jinjaenv`.
+  """
+  for name, _ in jinjaenv.loader.mapping.iteritems():
+    _create_descriptor(
+      name.replace(".template", ""),
+      jinjaenv.get_template(name), context, dest)
+
+
+def _load_descriptors():
+  """
+  loads yaml descriptor templates and returns an instance of a
+  `jinja2.Environment`
+  """
+  descriptors = opts.proj.dirs.gae.descriptors.walkfiles("*.yaml")
+  rv = Environment(loader=DictLoader(
+    {str(d.name): str(d.text()) for d in descriptors}
+  ))
+  return rv
+
+
+def _create_descriptor(name, template, context, dest):
+  """
+  parses the config template files and generates yaml descriptor files in
+  the root directory.
+
+    :param template: instance of a jinja2 template object
+    :param context: instance of a dict
+    :param dest: instance of a paver.easy.path object
+  """
+  descriptor = dest / name.replace(".template", "")
+  descriptor.write_text(template.render(**context))
+
+
+def build_descriptors(dest, env_id, ver_id=None):
+  """
+    :param dest:
+    :param env_id:
+    :param ver_id:
+  """
+  if ver_id is None:
+    ver_id = release.dist_version_id()
+
+  module_id = None
+  runtime = 'python27'
+  api_version = 1
+
+  builtins = [
+    'deferred',
+  ]
+
+  inbound_services = []
+  if env_id in ('prod', 'integration'):
+    # on local machine, warmup seems to be called in a continuous poll..
+    inbound_services.append('warmup')
+
+  context = dict(
+    app_id=opts.proj.app_id,
+    env_id=env_id,
+    ver_id=ver_id,
+    module_id=module_id,
+    templates_dir=str(opts.proj.dirs.app_web_templates.relpath()),
+    static_dir=str(opts.proj.dirs.app_web_static.relpath()),
+    builtins=builtins,
+    inbound_services=inbound_services,
+    runtime=runtime,
+    api_version=api_version,
+  )
+
+  render_jinjaenv(_load_descriptors(), context, dest)

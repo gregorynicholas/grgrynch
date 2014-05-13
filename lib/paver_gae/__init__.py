@@ -9,16 +9,18 @@
   :license: MIT, see LICENSE for more details.
 """
 from __future__ import unicode_literals
-from paver.easy import Bunch, options as opts, cmdopts
-from paver.easy import task, call_task
-from paver.easy import BuildFailure, error, path
-from paver.ext import archives, http, supervisor, pip
-from paver.ext import release, utils
-from paver.ext.utils import rm, sh
-from paver.ext.gae import remote_api
 from jinja2 import Environment
 from jinja2.loaders import DictLoader
 
+from paver.easy import Bunch, cmdopts
+from paver.easy import task, call_task
+from paver.easy import BuildFailure
+from paver.ext.project import opts
+from paver.ext import http, supervisor, pip
+from paver.ext import release, utils
+from paver.ext.utils import rm, sh
+
+from paver.ext.gae import descriptor
 from paver.ext.gae.appcfg import appcfg
 from paver.ext.gae.backends import *
 from paver.ext.gae.cron import *
@@ -26,16 +28,15 @@ from paver.ext.gae.dos import *
 from paver.ext.gae.index import *
 from paver.ext.gae.queue import *
 from paver.ext.gae.sdk import *
+from paver.ext.gae.oauth2 import *
 
 
 __all__ = [
-  "appcfg", "install_runtime_libs", "build_descriptors", "fix_gae_sdk_path",
-  "verify_serving", "ServerStartFailure",
-  "datastore_init", "open_admin",
+  "appcfg", "install_runtime_libs", "descriptor",
+  "verify_serving", "ServerStartFailure", "killall", "datastore_init",
   "server_run", "server_stop", "server_restart", "server_tail",
-  "deploy", "deploy_branch", "update_indexes",
+  "deploy", "deploy_branch", "update_indexes", "open_admin",
   "backends", "backends_rollback", "backends_deploy", "get_backends",
-  "remote", "killall",
 ]
 
 
@@ -58,97 +59,8 @@ class SdkServerNotRunningFailure(BuildFailure):
   """
 
 
-def _load_descriptors():
-  """
-    :returns: instance of a `jinja2.Environment`
-  """
-  descriptors = opts.proj.dirs.gae.descriptors.walkfiles("*.yaml")
-  rv = Environment(loader=DictLoader(
-    {str(d.name): str(d.text()) for d in descriptors}
-  ))
-  return rv
-
-
-def build_descriptors(dest, env_id, ver_id=None):
-  """
-    :param dest:
-    :param env_id:
-    :param ver_id:
-  """
-  if ver_id is None:
-    ver_id = release.dist_version_id()
-
-  module_id = None
-  runtime = 'python27'
-  api_version = 1
-
-  inbound_services = []
-  if env_id in ('prod', 'integration'):
-    # on local machine, warmup seems to be called in a continuous poll..
-    inbound_services.append('warmup')
-
-  context = dict(
-    app_id=opts.proj.app_id,
-    env_id=env_id,
-    ver_id=ver_id,
-    module_id=module_id,
-    templates_dir=str(opts.proj.dirs.app_web_templates.relpath()),
-    static_dir=str(opts.proj.dirs.app_web_static.relpath()),
-    inbound_services=inbound_services,
-    runtime=runtime,
-    api_version=api_version,
-  )
-
-  _render_jinjaenv(_load_descriptors(), context, dest)
-
-
-def _create_descriptor(name, template, context, dest):
-  """
-  parses the config template files and generates yaml descriptor files in
-  the root directory.
-
-    :param template: instance of a jinja2 template object
-    :param context: instance of a dict
-    :param dest: instance of a paver.easy.path object
-  """
-  descriptor = dest / name.replace(".template", "")
-  descriptor.write_text(template.render(**context))
-
-
-def _render_jinjaenv(jinjaenv, context, dest):
-  """
-  """
-  for name, _ in jinjaenv.loader.mapping.iteritems():
-    _create_descriptor(
-      name.replace(".template", ""),
-      jinjaenv.get_template(name), context, dest)
-
-
-def verify_serving(url, retries=15, sleep=2):
-  """
-  pings a url. used as a health check.
-
-    :param url:
-    :param retries:
-    :param sleep:
-  """
-  try:
-    http.ping(url, retries=retries, sleep=sleep)
-  except http.PingError:
-    raise SdkServerNotRunningFailure("""
-  can't connect to local appengine sdk server..
-  """)
-  else:
-    print "connected to local appengine server.."
-
-
-def fix_gae_sdk_path():
-  """
-  hack to load the app engine sdk into the python path.
-  """
-  import dev_appserver
-  dev_appserver.fix_sys_path()
-
+# shell command utils.
+# -----------------------------------------------------------------------------
 
 def _dev_appserver_config(config_id="default"):
   """
@@ -164,12 +76,31 @@ def _dev_appserver_config(config_id="default"):
   return config
 
 
-def parse_flags(cfg):
+def _parse_flags(cfg):
   """
   returns a string to run as the `dev_appserver.py` command.
   """
   flags = utils.parse_cmd_flags(cfg["args"], cfg["flags"])
   return "{}/dev_appserver.py {} .".format(opts.gae.sdk.root, flags)
+
+
+@task
+def verify_serving(url, retries=15, sleep=2):
+  """
+  pings a url. used as a health check.
+
+    :param url: full hostname address of the url.
+    :param retries: number of pings to attempt.
+    :param sleep: number of seconds to wait between pings.
+  """
+  try:
+    http.ping(url, retries=retries, sleep=sleep)
+  except http.PingError:
+    raise SdkServerNotRunningFailure("""
+  can't connect to local appengine sdk server..
+  """)
+  else:
+    print "connected to local appengine server.."
 
 
 def install_runtime_libs(packages, dest):
@@ -201,7 +132,7 @@ def install_runtime_libs(packages, dest):
 ])
 def deploy(options):
   """
-  deploys the app to google app engine production servers.
+  deploys the app to google app engine remote servers.
   """
   ver_id = release.dist_version_id()
   appcfg(
@@ -219,7 +150,7 @@ def deploy(options):
 
 def set_default_serving_version(ver_id):
   """
-  sets the default serving version on app engine production servers.
+  sets the default serving version on app engine remote servers.
 
     :param ver_id:
   """
@@ -248,7 +179,7 @@ def deploy_branch(options):
 @task
 def update_indexes():
   """
-  updates model index definitions on google app engine production servers.
+  updates model index definitions on google app engine remote servers.
   """
   appcfg("vacuum_indexes", quiet=True, cwd=opts.proj.dirs.dist)
   appcfg("update_indexes", quiet=True, cwd=opts.proj.dirs.dist)
@@ -268,13 +199,13 @@ def datastore_init():
   print("---> datastore_init success\n")
 
 
-dev_appserver_config_opt = (
+dev_appserver_config_option = (
   "config_id=", "c", "name of the configuration profile, defined in "
                      "dev_appserver.yaml, to run the server with.")
 
 
 @task
-@cmdopts([dev_appserver_config_opt])
+@cmdopts([dev_appserver_config_option])
 def server_run(options):
   """
   starts a google app engine server for local development.
@@ -286,7 +217,7 @@ def server_run(options):
   # if supervisor.is_pid_running(pid):
   #   raise ServerStartFailure("app engine sdk server is already running..")
 
-  dev_appserver_command = parse_flags(_dev_appserver_config(config_id))
+  dev_appserver_command = _parse_flags(_dev_appserver_config(config_id))
 
   # generate the supervisord.conf file
   context = dict(
@@ -302,7 +233,7 @@ def server_run(options):
     {'supervisord.template.conf': str(template)}
   ))
 
-  _render_jinjaenv(jinjaenv, context, opts.proj.dirs.base)
+  descriptor.render_jinjaenv(jinjaenv, context, opts.proj.dirs.base)
   supervisor.start()
 
   stdout = supervisor.run('devappserver-{}'.format(env_id))
@@ -311,7 +242,7 @@ def server_run(options):
 
 
 @task
-@cmdopts([dev_appserver_config_opt])
+@cmdopts([dev_appserver_config_option])
 def server_stop(options):
   """
   stops the google app engine sdk server.
@@ -339,10 +270,7 @@ def _stdout_path():
   """
   returns a path instance to the stdout log path.
   """
-  stdout = opts.proj.dirs.logs / "app.log"
-  # if not stdout.exists():
-  #   sh("touch {}".format(stdout), quiet=True)
-  return stdout
+  return opts.proj.dirs.logs / "app.log"
 
 
 @task
@@ -366,65 +294,6 @@ def open_admin(options):
   sh("open http://{url}:{port}/",
      cwd=opts.proj.dirs.base,
      **_dev_appserver_config(config_id).get("args"))
-
-
-@task
-def create_oauth2_token():
-  """
-  create an oauth2 token to use for subsequent calls to google.
-  """
-  run = "appcfg.py update --skip_sdk_update_check --oauth2 "
-  " --noauth_local_webserver . "
-  sh(run)
-
-
-@task
-def refresh_oauth2_token():
-  """
-  create an oauth2 token to use for subsequent calls to google.
-  """
-  run = "appcfg.py update --skip_sdk_update_check "
-  " --oauth2_refresh_token {} . "
-  sh(run)
-
-
-def _dev_appserver(env_id):
-  """
-  """
-  res = opts.proj.dev_appserver[env_id]
-  res.hostname = "{}:{}".format(res.host, res.port)
-  return res
-
-
-def remote(options):
-  """
-  attaches to an app engine remote_api endpoint.
-  """
-  env_id = options.get("env_id", opts.proj.envs.local)
-  dev_appserver = _dev_appserver(env_id)
-
-  partition = options.get("partition", dev_appserver.partition)
-  app_name = options.get("app_name", remote_api.DEFAULT_APP_NAME)
-  host = options.get("host", remote_api.DEFAULT_HOST_NAME)
-  path = options.get("path", remote_api.DEFAULT_ENDPOINT_PATH)
-  email = options.get("email")
-  password = options.get("password")
-
-  if env_id == opts.proj.envs.local:
-    verify_serving(host)
-    partition = "dev"
-
-  if email is None and host != remote_api.DEFAULT_HOST_NAME:
-    email = opts.proj.email
-    password = opts.proj.password
-
-  fix_gae_sdk_path()
-
-  print "connecting to remote_api: ", env_id, host, email, password
-
-  remote_api.connect(
-    "{}~{}-{}".format(partition, app_name, env_id),
-    path=path, host=host, email=email, password=password)
 
 
 @task
