@@ -47,7 +47,7 @@ def dist_version_id():
 def write_ver_id(ver_id):
   """
   writes the current version identifier (branch name for branch
-  deployments, last tag for qa/prod) to app/__init__.py
+  deployments, last tag for qa/prod) to `app/version.py`
   """
   ver_file = open(opts.proj.dirs.dist / "app" / "version.py", "w+")
   ver_file.write("__version__ = \"{}\"\n".format(ver_id))

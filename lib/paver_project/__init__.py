@@ -16,7 +16,7 @@ from paver.easy import path
 from paver.easy import options
 
 
-__all__ = ["proj"]
+__all__ = ["proj", "opts"]
 
 
 def load(config_path):
@@ -28,17 +28,20 @@ def load(config_path):
   p = yaml_load(config_path)["project"]
   rv = Bunch(**rbunch(p))
 
-  # set the project dirs as path'd objects.
+  # set the project dirs as `path` objects
   rv.dirs = Bunch(**rpath(p["dirs"]))
 
-  # manually add the the virtualenv path object.
+  # manually add the the `virtualenv` path object
   rv.dirs.venv = path(virtualenv.current())
+  rv.pip_config = path(rv.dirs.buildconfig / rv.pip_config)
 
   return rv
 
 
-#: shorthanded to `proj`
 proj = load("build/project.yaml")
 
-# set the `proj` var in the paver environment..
+# set the `proj` var in the paver environment options
 options(proj=proj)
+
+# export the options variable
+opts = options

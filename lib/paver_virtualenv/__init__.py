@@ -1,6 +1,6 @@
 """
-  paver.ext.gae
-  ~~~~~~~~~~~~~
+  paver.ext.virtualenv
+  ~~~~~~~~~~~~~~~~~~~~
 
   paver extension for virtualenv + virtualenvwrapper.
 

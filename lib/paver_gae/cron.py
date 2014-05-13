@@ -5,7 +5,7 @@
   paver extension to automate app engine.
 
 
-  :copyright: (c) 2013 by gregorynicholas.
+  :copyright: (c) 2014 by gregorynicholas.
   :license: MIT, see LICENSE for more details.
 """
 from __future__ import unicode_literals

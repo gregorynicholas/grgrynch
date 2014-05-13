@@ -35,6 +35,7 @@ __all__ = [
   "server_run", "server_stop", "server_restart", "server_tail",
   "deploy", "deploy_branch", "update_indexes",
   "backends", "backends_rollback", "backends_deploy", "get_backends",
+  "remote", "killall",
 ]
 
 
@@ -78,6 +79,8 @@ def build_descriptors(dest, env_id, ver_id=None):
     ver_id = release.dist_version_id()
 
   module_id = None
+  runtime = 'python27'
+  api_version = 1
 
   inbound_services = []
   if env_id in ('prod', 'integration'):
@@ -92,8 +95,8 @@ def build_descriptors(dest, env_id, ver_id=None):
     templates_dir=str(opts.proj.dirs.app_web_templates.relpath()),
     static_dir=str(opts.proj.dirs.app_web_static.relpath()),
     inbound_services=inbound_services,
-    runtime='python27',
-    api_version=1,
+    runtime=runtime,
+    api_version=api_version,
   )
 
   _render_jinjaenv(_load_descriptors(), context, dest)
@@ -178,11 +181,15 @@ def install_runtime_libs(packages, dest):
     :todo: zip each lib inside of the lib dir to serve third party libs
   """
   for f in pip.get_installed_top_level_files(packages):
-    print "sym linking: ", f
-    f.sym(dest / f.name)
-    # todo: check for missing `__init__.py`
-    # check = dest / f.name / '__init__.py'
-    # if not check.exists():
+    # print "sym linking: ", f
+    _path = dest / f.name
+
+    # symlink the path
+    f.sym(_path)
+
+    # ensure there's an `__init__.py` file in package roots
+    if _path.isdir() and not (_path / "__init__.py").exists():
+      (_path / "__init__.py").touch()
 
 
 @task
@@ -343,7 +350,7 @@ def server_tail():
   """
   view the dev_appserver logs by running the unix native "tail" command.
   """
-  print sh("tail -f {stdout}", stdout=_stdout_path(), capture=True)
+  print sh("tail -f {}", _stdout_path(), capture=True)
 
 
 @task
@@ -381,14 +388,20 @@ def refresh_oauth2_token():
   sh(run)
 
 
+def _dev_appserver(env_id):
+  """
+  """
+  res = opts.proj.dev_appserver[env_id]
+  res.hostname = "{}:{}".format(res.host, res.port)
+  return res
+
+
 def remote(options):
   """
   attaches to an app engine remote_api endpoint.
   """
   env_id = options.get("env_id", opts.proj.envs.local)
-
-  dev_appserver = opts.proj.dev_appserver[env_id]
-  host = "{}:{}".format(dev_appserver.host, dev_appserver.port)
+  dev_appserver = _dev_appserver(env_id)
 
   partition = options.get("partition", dev_appserver.partition)
   app_name = options.get("app_name", remote_api.DEFAULT_APP_NAME)
@@ -406,7 +419,9 @@ def remote(options):
     password = opts.proj.password
 
   fix_gae_sdk_path()
+
   print "connecting to remote_api: ", env_id, host, email, password
+
   remote_api.connect(
     "{}~{}-{}".format(partition, app_name, env_id),
     path=path, host=host, email=email, password=password)

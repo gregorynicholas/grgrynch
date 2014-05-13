@@ -43,24 +43,34 @@ def _normalize(name):
   return name.split("==")[0].split("#egg=")[-1].replace("-", "_").lower()
 
 
+def get_normalized_package_names(packages):
+  return [_normalize(_) for _ in packages]
+
+
 def get_installed_top_level_files(packages):
   """
-    :param packages:
-    :returns:
   """
   venvlib = opts.proj.dirs.venv / "lib/python2.7/site-packages"
-  runtimes = [_normalize(_) for _ in packages]
+  runtimes = get_normalized_package_names(packages)
   rv = []
   for egg in venvlib.walkdirs("*.egg-info"):
     dist = Distribution.from_location(egg, basename=str(egg.name))
+
     if _normalize(dist.project_name) not in runtimes:
       continue
+
     toplevels = (egg / "top_level.txt").text().split("\n")
     toplevels.remove("")
+
     for tlevel in [_ for _ in toplevels if _ != "tests"]:
-      if not (venvlib / tlevel).isdir():
+      _path = venvlib / tlevel
+
+      if not _path.isdir():
         tlevel += ".py"
+
       else:
-        pass  # todo: try to append an __init__ file
+        pass
+
       rv.append(venvlib / tlevel)
+
   return rv
