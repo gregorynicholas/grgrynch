@@ -108,7 +108,7 @@ def install_runtime_libs(packages, dest):
 @cmdopts([
   ("set-default", "d", "set the current dist version as the default serving "
                        "version on app engine.", False),
-  ("clear-cookies=", "c", "clear the local cookiejar before deploying.", True),
+  ("clear-cookies=", "c", "clear local cookies before deploying.", True),
   ("deploy-backends", "b", "flag to deploy the backend servers.", False),
 ])
 def deploy(options):
@@ -120,11 +120,11 @@ def deploy(options):
     "update -v ",
     error=False, capture=True, cwd=opts.proj.dirs.dist)
 
-  # if options.set_default:
-  #   set_default_serving_version(ver_id)
+  if options.set_default:
+    set_default_serving_version(ver_id)
 
-  # if options.deploy_backends:
-  #   call_task("backends_deploy")
+  if options.deploy_backends:
+    call_task("backends_deploy")
 
   print("---> deploy success\n")
 
@@ -286,6 +286,5 @@ def killall():
     sh("killall node", capture=True)
     sh("killall dev_appserver.py", capture=True)
     sh("killall _python_runtime.py", capture=True)
-    # sh("killall python", capture=True)
   except:
     pass
