@@ -41,6 +41,19 @@ def ping(url, retries=15, sleep=2):
   """)
 
 
+def health_check(url, retries=15, sleep=2):
+  """
+  pings a url. used as a health check.
+
+    :param url: full hostname address of the url.
+    :param retries: number of pings to attempt.
+    :param sleep: number of seconds to wait between pings.
+  """
+  ping(url, retries=retries, sleep=sleep)
+
+  print "connected to {}".format(url)
+
+
 def wget(src, dest, callback=None):
   """
     :param src: instance of a `paver.easy.path` object.

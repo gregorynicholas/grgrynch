@@ -9,7 +9,7 @@
   :license: MIT, see LICENSE for more details.
 """
 from __future__ import unicode_literals
-from paver.easy import call_task
+from paver.ext import http
 from paver.ext.project import opts
 
 
@@ -112,7 +112,8 @@ def remote(options):
   password = options.get("password")
 
   if env_id == opts.proj.envs.local:
-    verify_serving(host)
+    http.health_check(host)
+
     partition = "dev"
 
   if email is None and host != DEFAULT_HOST_NAME:

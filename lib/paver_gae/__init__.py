@@ -16,7 +16,7 @@ from paver.easy import Bunch, cmdopts
 from paver.easy import task, call_task
 from paver.easy import BuildFailure
 from paver.ext.project import opts
-from paver.ext import http, supervisor, pip
+from paver.ext import supervisor, pip
 from paver.ext import release, utils
 from paver.ext.utils import rm, sh
 
@@ -32,11 +32,11 @@ from paver.ext.gae.oauth2 import *
 
 
 __all__ = [
-  "appcfg", "install_runtime_libs", "descriptor",
-  "verify_serving", "ServerStartFailure", "killall", "datastore_init",
+  "appcfg", "install_runtime_libs", "descriptor", "killall", "datastore_init",
   "server_run", "server_stop", "server_restart", "server_tail",
   "deploy", "deploy_branch", "update_indexes", "open_admin",
   "backends", "backends_rollback", "backends_deploy", "get_backends",
+  "ServerStartFailure",
 ]
 
 
@@ -82,25 +82,6 @@ def _parse_flags(cfg):
   """
   flags = utils.parse_cmd_flags(cfg["args"], cfg["flags"])
   return "{}/dev_appserver.py {} .".format(opts.gae.sdk.root, flags)
-
-
-@task
-def verify_serving(url, retries=15, sleep=2):
-  """
-  pings a url. used as a health check.
-
-    :param url: full hostname address of the url.
-    :param retries: number of pings to attempt.
-    :param sleep: number of seconds to wait between pings.
-  """
-  try:
-    http.ping(url, retries=retries, sleep=sleep)
-  except http.PingError:
-    raise SdkServerNotRunningFailure("""
-  can't connect to local appengine sdk server..
-  """)
-  else:
-    print "connected to local appengine server.."
 
 
 def install_runtime_libs(packages, dest):
