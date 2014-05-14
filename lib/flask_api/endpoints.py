@@ -15,10 +15,8 @@ from flask import Blueprint
 from flask.ext.api.wtf import form_endpoint
 from logging import getLogger
 
-__all__ = [
-  "Endpoints", "register", "discover_endpoints",
-  "form_endpoint",
-]
+
+__all__ = ["Endpoints", "normalize", "discover", "form_endpoint"]
 
 log = getLogger(__name__)
 
@@ -55,12 +53,12 @@ class Endpoints(Blueprint):
     return self.route(*args, methods=methods, **kw)
 
 
-def register(endpoints_blueprint, url_prefix, subdomains=None):
+def normalize(endpoints_blueprint, url_prefix, subdomains=None):
   """
-  registers a dict for the arguments required to instantiate + register api
+  returns a dict for the arguments required to instantiate + register api
   `flask.Blueprint` endpoints to a `flask.Flask` application.
 
-    :param endpoints_blueprint:
+    :param endpoints_blueprint: instance of a `flask_api.Endpoints` object
     :param url_prefix:
     :param subdomain:
   """
@@ -85,7 +83,7 @@ def register(endpoints_blueprint, url_prefix, subdomains=None):
   return rv
 
 
-def discover_endpoints(file, pkg):
+def discover(module):
   """
   scans a directory of modules and gets a list of the `flask.ext.api.Endpoints`
   defined in each. for automatically registering as blueprints onto a flask
@@ -93,16 +91,22 @@ def discover_endpoints(file, pkg):
 
   on gae, this scan + lookup will be cached on initial module import.
 
-    :param file:
-    :param pkg:
+    :param module: string dot notation path of the package to scan
     :returns: list of dicts for the `flask.ext.api.Endpoints`
   """
-  api_module_suffix = "_api"
-  mods = os.listdir(os.path.dirname(file))
+  pkg = module.__package__
+
+  api_module_suffix = "_api.py"
+  modules = os.listdir(os.path.dirname(module.__file__))
+
   rv = []
-  for modname in [_ for _ in mods if _.endswith(api_module_suffix + ".py")]:
-    mod = __import__(
-      "{}.{}".format(pkg, modname[:-3]), globals(), locals(), ["endpoints"])
+
+  for module_file in [_ for _ in modules if _.endswith(api_module_suffix)]:
+    name = "{}.{}".format(pkg, module_file[:-3])
+    mod = __import__(name, globals(), locals(), ["endpoints"])
+
     if hasattr(mod, "endpoints"):
+      # append the list of blueprints exported by the module
       rv.extend(mod.endpoints)
+
   return rv

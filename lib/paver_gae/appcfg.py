@@ -37,14 +37,17 @@ def appcfg(command, **flags):
 
   flags.setdefault("skip_sdk_update_check", True)
 
-  appcfg_sh = '{gae_sdk}/appcfg.py {command} . {backend_id} {flags} '
+  appcfg_sh = '{gae_sdk}/appcfg.py {command} . {backend_id} {flags}'
   oauth2 = True
 
   # setup password-based auth..
   if hasattr(opts.proj, 'password') and opts.proj.password is not "":
     appcfg_sh = _wrap_appcfg_sh(
-      appcfg_sh, opts.proj.password)
-    flags.pop('oauth2', None)  # remove the oauth2 flag when password exists
+      appcfg_sh, opts.proj.email, opts.proj.password)
+
+    # remove the oauth2 flag when password exists
+    flags.pop('oauth2', None)
+    flags.pop('noauth_local_webserver', None)
     oauth2 = False
 
   flags = utils.to_flags(flags)
@@ -59,7 +62,10 @@ def appcfg(command, **flags):
     quiet=quiet)
 
   if cap:
-    res = utils.sh(appcfg_sh, cwd=cwd, _cwd=backend_cwd, **ctx)
+    appcfg_sh = appcfg_sh.format(**ctx)
+    # print 'running:', appcfg_sh
+
+    res = utils.sh(appcfg_sh, cwd=cwd, _cwd=backend_cwd)
 
     # check for existing oauth2 cookie file..
     if oauth2 and 'application does not exist' in res.lower():
@@ -73,10 +79,11 @@ def appcfg(command, **flags):
     return utils.sh(appcfg_sh, cwd=cwd, _cwd=backend_cwd, **ctx)
 
 
-def _wrap_appcfg_sh(appcfg_sh, password):
+def _wrap_appcfg_sh(appcfg_sh, email, password):
   """
   wraps an `appcfg` command string to accept the password arg.
   """
-  return 'echo "{password}" | {appcfg_sh} --passin '.format(
+  return 'echo "{password}" | {appcfg_sh} --email {email} --passin '.format(
+    email=email,
     password=password,
     appcfg_sh=appcfg_sh)

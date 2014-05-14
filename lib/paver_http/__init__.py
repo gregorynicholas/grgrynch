@@ -12,7 +12,7 @@ import urllib2
 import time
 from paver.ext.utils import sh
 
-__all__ = ["wget", "ping", "PingError"]
+__all__ = ["wget", "ping", "PingError", "health_check"]
 
 
 class PingError(ValueError):
