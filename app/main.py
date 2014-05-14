@@ -75,6 +75,7 @@ if config.sentry_dsn and config.sentry_dsn != '':
 # initialize the web routes.
 from app.web import errors
 from app.web import views
+#
 
 # initialize the web api.
 from app.web import api as web_api
@@ -83,3 +84,6 @@ from flask.ext import api as flask_api
 # discovers api endpoint `flask.Blueprints` based on naming conventions
 endpoint_blueprints = flask_api.discover(web_api)
 flask_api.API(flaskapp, endpoint_blueprints)
+
+# initialize warmup handler.
+from app.web import warmup
