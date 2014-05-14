@@ -218,8 +218,12 @@ def server_run(options):
   supervisor.start()
 
   stdout = supervisor.run('devappserver-{}'.format(env_id))
+
   if "ERROR (already started)" in stdout:
     raise ServerStartFailure("server already running..")
+
+  elif "ERROR" in stdout:
+    raise ServerStartFailure("server already running: {}".format(stdout))
 
 
 @task
