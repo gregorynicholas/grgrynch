@@ -1,0 +1,63 @@
+# circleci.com project build configuration.
+
+
+#
+# customize the virtual machine
+#
+machine:
+  timezone:
+    Europe/London
+  node:
+    version: 0.10.26
+  python:
+    version: 2.7.5
+  services:
+    # - mongodb
+
+
+#
+# customize dependencies.
+#
+dependencies:
+  pre:
+    # set logging only to >= warning
+    - npm config set loglevel warn
+  post:
+    - paver bootstrap
+    - paver build
+
+    # seed the database with test data
+    - paver serve
+    - paver dbseed
+    - paver stop
+
+
+test:
+  override:
+    # execute client functional & unit tests
+    - paver test_client
+
+    # execute python functional & integration tests
+    - paver test_backend --mode integration
+
+    # execute casperjs end-to-end tests
+    - paver test_headless_browser
+
+
+deployment:
+
+  # deploy develop branch to integration environment
+  integration:
+    branch: develop
+    commands:
+      - paver dist   --env_id integration
+      - paver deploy --default
+      - paver dbseed --env_id integration
+
+  # deploy master branch to qa environment
+  qa:
+    branch: master
+    commands:
+      - paver dist   --env_id qa
+      - paver deploy --default
+      - paver dbseed --env_id qa
