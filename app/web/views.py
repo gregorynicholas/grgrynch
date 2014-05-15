@@ -41,6 +41,9 @@ def index_get(subdomain=None):
 
 @flaskapp.route("/favicon.ico", subdomain="<subdomain>", methods=["GET"])
 def favicon(subdomain=None):
+  """
+  because chrome won't not try to prefetch this, even if it doesn't exist.
+  """
   return Response("", 200)
 
 
