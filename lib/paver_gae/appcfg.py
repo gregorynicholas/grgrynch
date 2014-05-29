@@ -68,7 +68,7 @@ def appcfg(command, **flags):
     res = utils.sh(appcfg_sh, cwd=cwd, _cwd=backend_cwd)
 
     # check for existing oauth2 cookie file..
-    if oauth2 and 'application does not exist' in res.lower():
+    if res and (oauth2 and 'application does not exist' in res.lower()):
       raise Exception(
         "oauth failed. make sure: `~/.appcfg_oauth2_tokens` doesn't exist.")
     else:
