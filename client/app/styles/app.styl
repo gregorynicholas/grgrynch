@@ -1,0 +1,298 @@
+@import "vendor.css"
+@import "mixins/stretch"
+@import "mixins/clearfix"
+
+
+// app ui vars
+// ----------------------------------------------------------------------------
+app-outer-width = 1400px
+app-inner-width = 1006px
+app-outer-gutters = (app-outer-width - app-inner-width)
+
+// offset the inner container by 30%
+outer-padding-left = round(app-outer-gutters * 0.3)
+outer-padding-right = round(app-outer-gutters * 0.7)
+
+app-outer-height = 1400px
+
+header-outer-height = 230px
+header-inner-height = 134px
+header-inner-gutter = round((header-outer-height - header-inner-height) / 2)
+
+
+// style vars
+// ----------------------------------------------------------------------------
+bgcolor = #000
+
+
+body
+  font-family Helvetica, Arial, sans-serif
+  min-height app-outer-height
+  background-color bgcolor
+  line-height initial
+  margin 0
+  padding 0
+
+
+.app-outer
+  padding-left outer-padding-left
+  padding-right outer-padding-right
+
+
+
+// screen responsiveness
+
+@media (min-width: 480px)
+  .col-lg-4.logo-wrapper
+    float right
+
+
+@media (min-width: 992px)
+  body
+    min-width app-outer-width
+
+  .app-outer
+    // subtract the padding
+    width (app-outer-width - (outer-padding-left + outer-padding-right))
+
+  .app-inner
+    width app-inner-width
+    margin-left 40px
+
+  .fixed-pos
+    position fixed
+    top 0
+
+  .fixed-wrapper
+    position relative
+
+
+header
+  padding-bottom 52px
+
+  .col-lg-4.its-80-and-bullshit
+    width 490px
+    height header-inner-height
+    background-image url('/img/header-01-weather-report.png')
+    background-repeat no-repeat
+
+  .col-lg-4.gregorynicholas-roles
+    width 391px
+    height header-inner-height
+    background-image url('/img/header-02-roles.png')
+    background-repeat no-repeat
+
+  .col-lg-4.logo-wrapper
+    width 125px
+    height header-inner-height
+    background-repeat no-repeat
+
+    &.animated-gif
+      background-image url('/img/header-03-logo.gif')
+
+    &.animated-css3
+      background-image url('/img/header-03-logo-ring.png')
+
+    .gregorynicholas-logo
+      width 125px
+      height header-inner-height
+      background-image url('/img/header-03-logo.png')
+      background-repeat no-repeat
+      margin-left -13px
+
+
+.header-inner
+  height header-inner-height
+  margin-top header-inner-gutter
+
+
+.bordered
+  border-bottom solid 1px #fff
+
+  // -webkit-transition display 1s ease-in-out
+  // -moz-transition display 1s ease-in-out
+  // -o-transition display 1s ease-in-out
+  // transition display 1s
+
+
+act-title-height = 379px
+
+.act-title
+  height act-title-height
+  border-top solid 1px #fff
+  border-bottom solid 1px #fff
+  text-align center
+  vertical-align middle
+  line-height act-title-height
+
+
+// intro
+
+#section-01-a
+  width 1006px
+  padding-top 245px
+
+
+#section-01-b
+  padding-top 45px
+
+
+#section-01-c
+  padding-top 45px
+  // add additional margin between act-i-title
+  padding-bottom 95px * 2
+
+
+// height-fix for act-i-title
+#section-02
+  height act-title-height * 1.2
+  line-height act-title-height * 1.2
+
+
+#section-03
+  height 393px
+  margin-bottom 180px
+
+  img
+    width 1139px
+    height 392px
+    margin-left -66px
+    position absolute
+
+
+// fucking down
+#section-04
+  padding-bottom 120px
+
+
+// coleman intro
+#section-05
+  margin-bottom 178px
+
+
+// 600 sq ft
+#section-06-a
+  text-align center
+  margin-bottom 48px
+
+
+#section-06-b
+  text-align center
+  margin-bottom 142px
+  margin-left 118px
+
+
+// blew it
+#section-07
+  text-align center
+
+
+// act-ii-title dropt
+#section-08
+  margin-bottom 150px
+
+
+#section-09
+  margin-bottom 140px
+  text-align center
+
+
+// instagram pull quote
+#section-10
+  padding-bottom 170px
+
+
+#section-11
+  padding-bottom 30px
+  margin-bottom 110px
+  text-align center
+
+
+// angelpad acceptable
+#section-12
+  margin-bottom 100px
+  text-align center
+
+
+// demo-day
+#section-13
+  margin-bottom 110px
+
+
+// act-iii-title pict pivot
+#section-14
+  margin-bottom 120px
+
+
+// no glory
+#section-15
+  margin-bottom 70px
+  text-align center
+
+
+// portfolio logos
+#section-16
+  text-align center
+  padding-bottom 112px
+  margin-bottom 130px
+
+
+// domain swoop
+#section-17
+  text-align center
+  padding-bottom 125px
+
+
+// act-iv-title unvael
+#section-18
+  margin-bottom 110px
+
+
+// pict acquisition
+#section-19
+  text-align center
+  padding-bottom 110px
+  margin-bottom 150px
+
+
+// fuck textbook
+#section-20
+  margin-bottom 55px
+
+
+// unvael intro
+#section-21
+  height 145px
+
+
+// cultural mecca
+#section-22
+  padding-bottom 80px
+  margin-bottom 120px
+
+
+// unvael's voice
+#section-23
+  text-align center
+  padding-bottom 105px
+
+
+// atypical founder
+#section-24
+  text-align center
+  padding-bottom 105px
+
+
+.bordered-01
+.bordered-02
+  margin 0 auto
+
+
+.bordered-01
+  width 38px
+  margin-bottom 100px
+
+
+.bordered-02
+  width 26px
+  margin-bottom 100px

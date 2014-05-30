@@ -1,0 +1,8 @@
+@font-face {
+    font-family: 'CharterBold';
+    src: url('/fonts/itc-charter-bold.eot');
+    src: url('/fonts/itc-charter-bold.eot') format('embedded-opentype'),
+         url('/fonts/itc-charter-bold.woff') format('woff'),
+         url('/fonts/itc-charter-bold.ttf') format('truetype'),
+         url('/fonts/itc-charter-bold.svg#CharterBold') format('svg');
+}

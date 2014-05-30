@@ -122,3 +122,4 @@ supervisord.log
 *google-api-python-client*
 
 /logs/*
+client/build/
