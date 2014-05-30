@@ -1,0 +1,140 @@
+# application: {{app_id}}-{{env_id}}
+application: {{app_id}}
+version: "{{ver_id}}"
+runtime: {{runtime}}
+api_version: {{api_version}}
+threadsafe: yes
+default_expiration: "1h"
+
+{% if module_id %}
+module: {{module_id}}
+{% endif %}
+
+
+env_variables:
+  APP_ID: "{{app_id}}"
+  ENV_ID: "{{env_id}}"
+  VER_ID: "{{ver_id}}"
+
+
+handlers:
+
+
+# appengine built-ins
+
+- url: /_ereporter.*
+  script: google.appengine.ext.ereporter.report_generator.application
+
+- url: /_ah/warmup
+  script: app.main.flaskapp
+
+# - url: /_ah/appstats.*
+#   script: google.appengine.ext.appstats.ui.app
+
+# - url: /_ah/mapreduce.*
+#   script: mapreduce.main.APP
+
+# - url: /_ah/pipeline.*
+#   script: mapreduce.lib.pipeline.handlers._APP
+
+# - url: /mapreduce/pipeline/images
+#   static_dir: lib/mapreduce/lib/pipeline/ui/images
+
+# - url: /mapreduce(/.*)?
+#   script: mapreduce.main.APP
+
+
+# application routes
+
+- url: /img/
+  static_dir: app/web/static/img/
+
+- url: /fonts/
+  static_dir: app/web/static/fonts/
+
+- url: /static/
+  static_dir: app/web/static/
+
+- url: .*
+  script: app.main.flaskapp
+
+
+libraries:
+- name: jinja2
+  version: "2.6"
+
+- name: lxml
+  version: "2.3"
+
+
+# includes:
+# - build/includes.yaml
+
+
+inbound_services:
+{% for service in inbound_services %}
+- {{service}}
+{% endfor %}
+
+
+builtins:
+{% for builtin in builtins %}
+- {{builtin}}: on
+{% endfor %}
+
+
+# force precompilation on deploy.
+derived_file_type:
+- python_precompiled
+
+
+skip_files:
+- ^(.*/)?.*\.py[co]
+- ^(.*/)?.*/RCS/.*
+- ^(.*/)?\.bak
+- ^(.*/)?\.coverage
+- ^(.*/)?\.md
+- ^(.*/)?\.rc
+- ^(.*/)?\.sh
+
+- ^(.*/)?requirements.txt
+- ^(.*/)?.*\.yml
+- ^(.*/)?.*\.yaml
+- ^(.*/)?.*~
+- ^(.*/)?\..*
+- ^(.*/)?\.git/.*
+- ^(.*/)?\.svn/.*
+
+- ^(.*/)?logs/.*
+- ^(.*/)?\.data/.*
+- ^(.*/)?.build/.*
+- ^(.*/)?.dist/.*
+- ^(.*/)?.egg-info/.*
+- ^(.*/)?.lint/.*
+- ^(.*/)?.pip/.*
+
+# buildconfig dir
+- ^(.*/)?build/.*
+
+# client
+- ^(.*/)?client/.*
+- ^(.*/)?ui/.*
+
+- ^(.*/)?django/.*
+- ^(.*/)?docs/.*
+
+# paver
+- ^(.*/)?paver_.*
+- ^(.*/)?pavement\.py
+
+# tests
+- ^(.*/)?testsuite/.*
+- ^(.*/)?tests/.*
+- ^(.*/)?_tests\.py
+
+# mongoengine
+- ^(.*/)?bson/.*
+- ^(.*/)?flask_mongoengine/.*
+- ^(.*/)?gridfs/.*
+- ^(.*/)?mongoengine/.*
+- ^(.*/)?pymongo/.*
