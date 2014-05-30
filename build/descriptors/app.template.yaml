@@ -122,6 +122,7 @@ skip_files:
 
 - ^(.*/)?django/.*
 - ^(.*/)?docs/.*
+- ^(.*/)?lib/wtforms/ext/i18n/.*
 
 # paver
 - ^(.*/)?paver_.*
