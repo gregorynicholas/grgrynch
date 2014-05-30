@@ -36,15 +36,16 @@ body
 
 .app-outer
   padding-left outer-padding-left
-  padding-right outer-padding-right
+  // padding-right outer-padding-right
 
 
 
 // screen responsiveness
 
 @media (min-width: 480px)
-  .col-lg-4.logo-wrapper
-    float right
+  // todo: this needs to be overridden in next block
+  // .col-lg-4.logo-wrapper
+  //   float right
 
 
 @media (min-width: 992px)
@@ -53,7 +54,8 @@ body
 
   .app-outer
     // subtract the padding
-    width (app-outer-width - (outer-padding-left + outer-padding-right))
+    // width (app-outer-width - (outer-padding-left + outer-padding-right))
+    width app-outer-width
 
   .app-inner
     width app-inner-width
@@ -71,21 +73,23 @@ header
   padding-bottom 52px
 
   .col-lg-4.its-80-and-bullshit
-    width 490px
+    // width 490px
     height header-inner-height
     background-image url('/img/header-01-weather-report.png')
     background-repeat no-repeat
+    background-position right top
 
   .col-lg-4.gregorynicholas-roles
-    width 391px
+    // width 391px
     height header-inner-height
     background-image url('/img/header-02-roles.png')
     background-repeat no-repeat
 
   .col-lg-4.logo-wrapper
-    width 125px
+    // width 125px
     height header-inner-height
     background-repeat no-repeat
+    background-position center top
 
     &.animated-gif
       background-image url('/img/header-03-logo.gif')
@@ -98,7 +102,7 @@ header
       height header-inner-height
       background-image url('/img/header-03-logo.png')
       background-repeat no-repeat
-      margin-left -13px
+      margin 0 auto
 
 
 .header-inner
@@ -115,7 +119,7 @@ header
   // transition display 1s
 
 
-act-title-height = 379px
+act-title-height = 440px
 
 .act-title
   height act-title-height
