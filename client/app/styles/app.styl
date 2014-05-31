@@ -27,35 +27,49 @@ bgcolor = #000
 
 body
   font-family Helvetica, Arial, sans-serif
-  min-height app-outer-height
   background-color bgcolor
   line-height initial
   margin 0
   padding 0
 
 
-.app-outer
-  padding-left outer-padding-left
-  // padding-right outer-padding-right
-
-
 
 // screen responsiveness
 
 @media (min-width: 480px)
-  // todo: this needs to be overridden in next block
-  // .col-lg-4.logo-wrapper
-  //   float right
+  .app-outer
+    padding-left round(outer-padding-left / 2)
+
+
+
+// adjust the header
+
+@media (min-width: 480px)
+  header
+    .its-80-and-bullshit
+      display none
+
+
+@media (max-width: 991px)
+  header
+    .its-80-and-bullshit
+      display none
 
 
 @media (min-width: 992px)
   body
     min-width app-outer-width
 
+  // show the bullshit only on bigger screens
+  header
+    .its-80-and-bullshit
+      display block
+
   .app-outer
     // subtract the padding
     // width (app-outer-width - (outer-padding-left + outer-padding-right))
     width app-outer-width
+    padding-left outer-padding-left
 
   .app-inner
     width app-inner-width
@@ -72,20 +86,29 @@ body
 header
   padding-bottom 52px
 
-  .col-lg-4.its-80-and-bullshit
+  .its-80-and-bullshit
     // width 490px
     height header-inner-height
     background-image url('/img/header-01-weather-report.png')
     background-repeat no-repeat
     background-position right top
+    opacity 0.3
 
-  .col-lg-4.gregorynicholas-roles
+  .gregorynicholas-roles
     // width 391px
     height header-inner-height
     background-image url('/img/header-02-roles.png')
     background-repeat no-repeat
+    opacity 0.3
 
-  .col-lg-4.logo-wrapper
+    &:hover
+      opacity 1
+      -webkit-transition opacity 0.7s ease-in-out
+      -moz-transition opacity 0.7s ease-in-out
+      -o-transition opacity 0.7s ease-in-out
+      transition opacity 0.7s
+
+  .logo-wrapper
     // width 125px
     height header-inner-height
     background-repeat no-repeat
@@ -112,11 +135,6 @@ header
 
 .bordered
   border-bottom solid 1px #fff
-
-  // -webkit-transition display 1s ease-in-out
-  // -moz-transition display 1s ease-in-out
-  // -o-transition display 1s ease-in-out
-  // transition display 1s
 
 
 act-title-height = 440px
