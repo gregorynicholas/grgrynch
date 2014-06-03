@@ -68,7 +68,7 @@ window.requestAnimFrame = (->
 
     prllx blob4, 0,   pos(-170, 300, rel_y, 0)
 
-    prllx blob6a, 0,  pos(-225, 225, rel_y, 0)
+    prllx blob6a, 0,  pos(-275, 275, rel_y, 0)
 
     # TODO: fuck you jesus, broken
     # prllx blob7, 0,  pos(-150, 150, rel_y, 0)
@@ -138,6 +138,35 @@ window.requestAnimFrame = (->
 
 ) window, document
 
+
+$("#section-07").appear()
+
+
+has_appeared = {}
+
+
+$(document.body).on 'appear', '#section-07', (e, $affected) ->
+  $el = $(@)
+  id = $el.attr('id')
+  return if has_appeared[id]
+  has_appeared[id] = true
+
+  $div = $el.find('div')
+  $img = $div.find('img')
+  $div.stop().animate({ opacity: 1 }, 1000)
+  $img.stop().animate({ opacity: 1, marginTop: 0 }, 1250, 'easeInOutExpo')
+
+
+$(document.body).on 'disappear', '#section-07', (e, $affected) ->
+  $el = $(@)
+  id = $el.attr('id')
+
+  $div = $el.find('div')
+  $img = $div.find('img')
+  $div.stop().css opacity: 0
+  $img.stop().css opacity: 0, marginTop: 200
+
+  has_appeared[id] = false
 
 
 $logo = $ '.animated-css3'
