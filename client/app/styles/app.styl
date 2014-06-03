@@ -75,13 +75,6 @@ body
     width app-inner-width
     margin-left 40px
 
-  .fixed-pos
-    position fixed
-    top 0
-
-  .fixed-wrapper
-    position relative
-
 
 header
   padding-bottom 52px
@@ -148,6 +141,27 @@ act-title-height = 440px
   line-height act-title-height
 
 
+// parallax
+
+// #blob-1,
+// #blob-2,
+// #blob-3,
+// #blob-4,
+// #blob-5,
+// #blob-6,
+// #blob-7,
+// #blob-8,
+// #blob-9
+//   // display none
+//   // position absolute
+//   z-index 0
+
+
+#section-04,
+#section-08
+  overflow hidden
+
+
 // intro
 
 #section-01-a
@@ -169,13 +183,15 @@ act-title-height = 440px
 #section-02
   height act-title-height * 1.2
   line-height act-title-height * 1.2
+  overflow hidden
 
 
 #section-03
   height 393px
   margin-bottom 180px
 
-  img
+  div
+    background url('/img/narrative/bgs/03-vael-intro-bg.jpg') no-repeat top center
     width 1139px
     height 392px
     margin-left -66px
@@ -207,6 +223,14 @@ act-title-height = 440px
 // blew it
 #section-07
   text-align center
+  min-height 466px
+
+  div
+    background url('/img/narrative/bgs/07-blew-it-bg.jpg') no-repeat top center
+    width 740px
+    height 466px
+    margin-left 144px
+    position absolute
 
 
 // act-ii-title dropt
@@ -318,3 +342,12 @@ act-title-height = 440px
 .bordered-02
   width 26px
   margin-bottom 100px
+
+
+#blob-container
+  position absolute
+  left 0
+  top 0
+  width 960px
+  height 3000px
+  overflow hidden

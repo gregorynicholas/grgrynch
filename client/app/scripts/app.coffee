@@ -3,44 +3,141 @@ $window = $ window
 $doc = $ document
 
 
-startDebounce = ->
-  console.info 'startDebounce'
+# frames per second, for a nice, smooth buttox
+fps = 60
 
-  $window = $ window
-
-  debounceTimeScroll = 500
-  debounceTimeResize = 250
-  didScroll = false
-  didResize = false
-
-
-  # bind event handlers
-
-  $window.on 'scroll', ->
-    didScroll = true
-
-  $window.on 'resize', ->
-    didResize = true
+# shim layer with setTimeout fallback
+window.requestAnimFrame = (->
+  window.requestAnimationFrame or window.webkitRequestAnimationFrame or window.mozRequestAnimationFrame or window.oRequestAnimationFrame or window.msRequestAnimationFrame or (callback) ->
+    window.setTimeout callback, 1000 / fps
+    return
+)()
 
 
-  # rate limiting function hooks
+((win, doc) ->
 
-  setInterval (->
-    return if not didScroll
+  $ = doc.querySelector.bind doc
 
-    didScroll = false
-    $window.trigger 'dScroll'
+  blob1a = $ "#blob-1a"
+  blob1b = $ "#blob-1b"
+  blob1c = $ "#blob-1c"
 
-  ), debounceTimeScroll
+  # act-i title
+  blob2 = $ "#blob-2"
+
+  blob3 = $ "#blob-3"
+  blob4 = $ "#blob-4"
+  blob5 = $ "#blob-5"
+  blob6a = $ "#blob-6a"
+  blob6b = $ "#blob-6b"
+
+  # blew it.. jesus
+  blob7 = $ "#blob-7"
+
+  # act-ii title
+  blob8 = $ "#blob-8"
+
+  blob9 = $ "#blob-9"
+
+  # act-iii title
+  blob14 = $ "#blob-14"
+
+  # act-iv title
+  blob18 = $ "#blob-18"
 
 
-  setInterval (->
-    return if not didResize
+  # lock for de-bouncing
+  is_ticking = false
 
-    didResize = false
-    $window.trigger 'dResize'
+  # tracks window scroll pos.
+  # also used to control easing effects
+  scroll_y = 0
 
-  ), debounceTimeResize
+
+  # the main method for fucking with parallax shiz
+  updateElements = ->
+    ease_factor = 3000
+    rel_y = scroll_y / ease_factor
+
+    prllx blob1a, 0,  pos(1, -700,   rel_y, 0)
+    prllx blob1b, 0,  pos(1, -400,   rel_y, 0)
+    prllx blob1c, 0,  pos(1, -100,   rel_y, 0)
+
+    prllx blob2, 311, pos(-100, 575, rel_y, 0)
+    prllx blob3, 0, pos(100, -250, rel_y, 0)
+
+    prllx blob4, 0,   pos(-170, 300, rel_y, 0)
+
+    prllx blob6a, 0,  pos(-225, 225, rel_y, 0)
+
+    # TODO: fuck you jesus, broken
+    # prllx blob7, 0,  pos(-150, 150, rel_y, 0)
+
+    # prllx blob8, 10, pos(-250, 250, rel_y, 0)
+
+    # prllx blob5, 0,  pos(1730, -2900, rel_y, 0)
+    # prllx blob6, 0,  pos(2860, -4900, rel_y, 0)
+    # prllx blob7, 0,  pos(2550, -1900, rel_y, 0)
+    # prllx blob8, 0,  pos(2300, -700,  rel_y, 0)
+    # prllx blob9, 0,  pos(3700, -6000, rel_y, 0)
+
+    is_ticking = false
+
+
+  # the main algo for creating the parallax effects
+  # params: base, range, relative-y, offset
+  pos = (base, range, relative_y, offset) ->
+    rv = base + limit(0, 1, relative_y - offset) * range
+    # console.info 'relative_y:', relative_y, 'rv:', rv
+    rv
+
+
+  limit = (min, max, value) ->
+    Math.max(min, Math.min(max, value))
+
+
+  fade = (obj, alpha) ->
+    prefix obj.style, "opacity", alpha
+
+
+  prllx = (obj, x, y) ->
+    prefix obj.style, "Transform", "translate3d(#{x}px, #{y}px, 0)"
+
+
+  # cross browser prefixing for css declarations
+  prefix = (obj, prop, value) ->
+    prefs = ["webkit", "Moz", "o", "ms"]
+    for pref of prefs
+      obj[prefs[pref] + prop] = value
+
+
+  # event bindings..
+
+  onResize = ->
+    updateElements win.scrollY
+
+
+  onScroll = (evt) ->
+    unless is_ticking
+      is_ticking = true
+      requestAnimFrame updateElements
+      scroll_y = win.scrollY
+      # console.info 'scroll_y:', scroll_y
+
+
+  (->
+    updateElements win.scrollY
+    blob2.classList.add "force-show"
+    # blob6a.classList.add "force-show"
+    blob6b.classList.add "force-show"
+    blob7.classList.add "force-show"
+  )()
+
+  win.addEventListener "resize", onResize, false
+  win.addEventListener "scroll", onScroll, false
+
+) window, document
+
 
 
 $logo = $ '.animated-css3'
@@ -60,76 +157,3 @@ $logo.on 'mouseover', ->
   rotate ->
     console.info 'unlocking animate'
     lock_animate = false
-
-
-startDebounce()
-
-
-init = ->
-  $root = $ "html, body"
-  docHeight = $root.height()
-  $wrap = $ ".fixed-wrapper"
-
-  $head = $wrap.find ">header"
-  $sections = $wrap.find ">section"
-
-  $story = $ "#intro"
-  $what = $ "#what"
-  $where = $ "#where"
-  $contact = $ "#contact"
-  $footer = $ "#footer"
-
-  storyOffset = $story.offset()
-  storyHeight = $story.outerHeight()
-
-  whatOffset = $what.offset()
-  whatHeight = $what.outerHeight()
-  whereOffset = $where.offset()
-  whereHeight = $where.outerHeight()
-
-  contactOffset = $contact.offset()
-  contactHeight = $contact.outerHeight()
-
-  winH = $window.height()
-  winW = $window.width()
-  scrollTop = $window.scrollTop()
-
-  oldScroll = 0
-  sectionExtraHeight = winH * 6
-  cumExtraHeight = sectionExtraHeight * $sections.length
-  centerBuffer = 100
-  scaleFactor = 4
-  scrollBottom = 780
-  $fixWrapper = null
-
-  $('body').css
-    height: ($wrap.height() * scaleFactor) + cumExtraHeight + $footer.height()
-
-  $story.on 'scrollInView', (e, start, end, prog) ->
-    # console.log('scrollTop: ' + scrollTop, ' | start: ' + start, ' | end: ' + end, ' | prog: ' + prog )
-
-  $window.on 'scroll', (e) ->
-    scroll = $window.scrollTop()
-    scrollPaused = false
-    fauxScroll = -(scrollTop) / scaleFactor
-
-    $sections.each (i, e) ->
-      $this = $ @
-      centerPos = $this.data 'centerPos'
-
-      if scroll > centerPos - centerBuffer && scroll < centerPos + sectionExtraHeight + centerBuffer
-        scrollPaused = true
-        calcMarginTop = -1 * ((centerPos/scaleFactor) - ((sectionExtraHeight/scaleFactor) * i))
-
-        if not $.support.transition
-          $fixWrapper.css marginTop: calcMarginTop
-        else
-          $fixWrapper.transition
-            marginTop: calcMarginTop,
-            easing: 'ease-out',
-            duration: 200,
-            queue: false
-
-        $this.trigger 'scrollInView', [centerPos - centerBuffer, centerPos + sectionExtraHeight + centerBuffer]
-
-init()
