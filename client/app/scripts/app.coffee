@@ -51,24 +51,26 @@ window.requestAnimFrame = (->
 
   # tracks window scroll pos.
   # also used to control easing effects
+  scroll_x = 0
   scroll_y = 0
-
 
   # the main method for fucking with parallax shiz
   updateElements = ->
     ease_factor = 3000
+    rel_x = scroll_x / ease_factor
     rel_y = scroll_y / ease_factor
+    rel_z = 0
 
-    prllx blob1a, 0,  pos(1, -700,   rel_y, 0)
-    prllx blob1b, 0,  pos(1, -400,   rel_y, 0)
-    prllx blob1c, 0,  pos(1, -100,   rel_y, 0)
+    prllx blob1a, 0,  pos(1, -700,   rel_y, 0, rel_z)
+    prllx blob1b, 0,  pos(1, -400,   rel_y, 0, rel_z)
+    prllx blob1c, 0,  pos(1, -100,   rel_y, 0, rel_z)
 
-    prllx blob2, 311, pos(-100, 575, rel_y, 0)
-    prllx blob3, 0, pos(100, -250, rel_y, 0)
+    prllx blob2, 311, pos(-100, 575, rel_y, 0, rel_z)
+    prllx blob3, 0, pos(100, -250, rel_y, 0, rel_z)
 
-    prllx blob4, 0,   pos(-170, 300, rel_y, 0)
+    prllx blob4, 0,   pos(-170, 300, rel_y, 0, rel_z)
 
-    prllx blob6a, 0,  pos(-275, 275, rel_y, 0)
+    prllx blob6a, 0,  pos(-275, 275, rel_y, 0, rel_z)
 
     # TODO: fuck you jesus, broken
     # prllx blob7, 0,  pos(-150, 150, rel_y, 0)
@@ -100,13 +102,12 @@ window.requestAnimFrame = (->
     prefix obj.style, "opacity", alpha
 
 
-  prllx = (obj, x, y) ->
-    prefix obj.style, "Transform", "translate3d(#{x}px, #{y}px, 0)"
-
+  prllx = (obj, x, y, z) ->
+    prefix obj.style, "transform", "translate3d(#{x}px, #{y}px, #{z}px)"
 
   # cross browser prefixing for css declarations
   prefix = (obj, prop, value) ->
-    prefs = ["webkit", "Moz", "o", "ms"]
+    prefs = ["webkit", "moz", "o", "ms", ""]
     for pref of prefs
       obj[prefs[pref] + prop] = value
 
