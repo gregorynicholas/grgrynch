@@ -2,7 +2,6 @@ grgrynch
 ========
 
 source code for [gregorynicholas.com](http://gregorynicholas.com)
-(a google appengine app).
 
 <br />
 
