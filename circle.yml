@@ -36,7 +36,7 @@ dependencies:
     - . build/ci/dependencies/paver-setup.sh
 
   override:
-    - pyenv exec paver bootstrap_backend;
+    - pyenv exec paver bootstrap_server;
     - pyenv exec paver bootstrap_client;
     # - pyenv exec paver bootstrap
     # - pyenv exec paver build
@@ -53,7 +53,7 @@ test:
     - pyenv exec paver test_client
 
     #@ execute python functional & integration tests
-    - pyenv exec paver test_backend --mode integration
+    - pyenv exec paver test_server --mode integration
 
     #@ execute casperjs end-to-end tests
     - pyenv exec paver test_headless_browser

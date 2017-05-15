@@ -2,23 +2,33 @@
   pavement
   ~~~~~~~~
 
-  paver tasks. the bread+butter to automating everything.
+  paver tasks. automate everything.
 
 
-  :copyright: (c) 2014 by gregorynicholas.
-  :license: MIT, see LICENSE for more details.
+  :copyright: (c) by gregorynicholas.
+
 """
 import os
 import sys
 sys.path.insert(0, "lib")
 sys.path.append(os.path.abspath("."))
+from hashlib import sha256
+from itertools import chain
+# from collections import defaultdict
+#: imported first to load project config options.
+from paver.ext.project import proj
+from paver.ext.project import opts
 
-# imported first to load project config options.
-from paver.ext.project import proj, opts
+from paver.ext.utils import yaml_load
+from paver.ext.utils import file_to_utf8
+from paver.ext.utils import rm
+from paver.ext.utils import sh
+from paver.ext.utils import sym
 
-from paver.ext.utils import sh, rm, yaml_load
 from paver.easy import BuildFailure
 from paver.easy import task, call_task, cmdopts
+from paver.options import Namespace
+
 from paver.ext import (
   casperjs,
   client,
@@ -29,9 +39,9 @@ from paver.ext import (
   virtualenv)
 
 
-env_id_option = (
+env_id_opt = (
   "env_id=", "e",
-  "the environment to seed data to. is one of {}.".format(proj.envs))
+  "the environment to seed data to. is one of {}.".format(opts.proj.envs))
 
 
 class InvalidEnvironmentIdOption(BuildFailure):
@@ -48,13 +58,13 @@ def _validate_env_id(options, optional=False):
   env_id = options.get("env_id", None)
   if env_id is None and not optional:
     err = True
-  if not err and (env_id not in proj.envs):
+  if not err and (env_id not in opts.proj.envs):
     err = True
   if err:
     raise InvalidEnvironmentIdOption("""
   an environment must be specified with the -e flag as one of:
     {}
-  """.format(proj.envs))
+  """.format(opts.proj.envs))
 
 
 def _bootstrap_init_dirs():
@@ -65,17 +75,32 @@ def _bootstrap_init_dirs():
   opts.proj.dirs.lint.reports.makedirs()
 
 
-def _load_pip_config():
-  return yaml_load(opts.proj.pip_config)
+def _load_dependencies_config():
+  print 'loading pip dependencies config..'
+  return yaml_load(opts.proj.pip_dependencies)
 
 
 def _install_pip_packages():
-  packages = _load_pip_config()
+  packages = _load_dependencies_config()
 
+  print 'installing build pip dependency packages..'
   pip.install(packages, 'build')
+
+  print 'installing runtime pip dependency packages..'
   pip.install(packages, 'runtime')
 
-  gae.install_runtime_libs(packages['runtime'], opts.proj.dirs.lib)
+  print 'installing gae runtime libs..'
+  gae.install_runtime_libs(packages, opts.proj.dirs.lib)
+
+
+@task
+def bootstrap_server():
+  """
+  backend server setup + install.
+  also configures 3rd party external python dependencies.
+  """
+  opts.proj.dirs.lib.makedirs()
+  _install_pip_packages()
 
 
 @task
@@ -87,15 +112,6 @@ def bootstrap_client():
   sh("npm install -g grunt grunt-cli bower stylus coffee-script")
   sh("npm install", cwd=opts.proj.dirs.client)
   sh("bower install", cwd=opts.proj.dirs.client)
-
-
-@task
-def bootstrap_server():
-  """
-  installs python packages.
-  """
-  opts.proj.dirs.lib.makedirs()
-  _install_pip_packages()
 
 
 @task
@@ -163,7 +179,7 @@ def build_client():
 
 
 @task
-@cmdopts([env_id_option])
+@cmdopts([env_id_opt])
 def build(options):
   """
   builds a debug version of the app for local development.
@@ -258,7 +274,7 @@ def test_headless_browser():
 
 
 @task
-@cmdopts([env_id_option])
+@cmdopts([env_id_opt])
 def dist_build(options):
   """
   builds a release version of the app for deployment.
@@ -297,7 +313,7 @@ def dist_build(options):
 
 
 @task
-@cmdopts([env_id_option])
+@cmdopts([env_id_opt])
 def dist_release(options):
   """
   make a release, deploy it to the target environment.
@@ -317,7 +333,7 @@ def dist_release(options):
 
 
 @task
-@cmdopts([env_id_option])
+@cmdopts([env_id_opt])
 def dbseed(options):
   """
   load any reference data into the datastore if it"s not already present.

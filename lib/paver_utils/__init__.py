@@ -5,8 +5,8 @@
   hoping to make life easier for every engineer.
 
 
-  :copyright: (c) 2014 by gregorynicholas.
-  :license: MIT, see LICENSE for more details.
+  :copyright: (c) by gregorynicholas.
+
 """
 from __future__ import unicode_literals
 import os
@@ -115,7 +115,7 @@ def sym(src, dest):
     :param src: instance of a `paver.easy.path` object.
     :param dest: instance of a `paver.easy.path` object.
   """
-  rm(dest)
+  rm(dest)  # TODO: unlink..
   return src.symlink(dest)
 
 
@@ -123,6 +123,9 @@ def yaml_load(path):
   """
     :param path: instance of a `paver.easy.path` object.
   """
+  if not path.exists():
+    raise ValueError('yaml file not found: {}'.format(path))
+
   with open(path, "r") as f:
     rv = yaml.safe_load(f)
   return rv

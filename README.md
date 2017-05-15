@@ -43,13 +43,13 @@ eval "$(pyenv init -)" && eval "$(pyenv virtualenv-init -)";
 pyenv virtualenv 2.7.11 GRGRYNCH-2.7.11;
 pyenv activate GRGRYNCH-2.7.11;
 pyenv exec pip install pip --upgrade --quiet;
-pyenv exec pip install --disable-pip-version-check --verbose -r $REPO_ROOT/build/pip-paver-deps.txt;
-pyenv exec pip install --disable-pip-version-check --verbose -r $REPO_ROOT/build/pip-paver.txt;
+pyenv exec pip install --disable-pip-version-check --verbose -r ./build/pip-paver-deps.txt;
+pyenv exec pip install --disable-pip-version-check --verbose -r ./build/pip-paver.txt;
 ```
 
 ```sh
 # pyenv exec paver bootstrap;
-pyenv exec paver bootstrap_backend;
+pyenv exec paver bootstrap_server;
 pyenv exec paver bootstrap_client;
 # pyenv exec paver bootstrap_init_dirs;
 pyenv exec paver gae:install_sdk;
