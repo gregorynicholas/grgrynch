@@ -1,4 +1,5 @@
 #@ circleci.com project build configuration.
+#@ see https://circleci.com/docs/1.0/configuration/
 
 
 #@
@@ -13,35 +14,49 @@ machine:
     version: 2.7.11
   services:
     # - mongodb
+  environment:
+    # PYENV_ROOT: "$HOME/.pyenv"
+
+
+## unused stage..
+checkout:
+  override:
+  post:
+    - . build/ci/checkout/virtualenv-setup.sh
 
 
 #@
 #@ customize dependencies
 #@
 dependencies:
-  pre:
-    #@ set logging only to >= warning
-    - npm config set loglevel warn
-  post:
-    - paver bootstrap
-    - paver build
 
-    # seed the database with test data
-    - paver serve
-    - paver dbseed
-    - paver stop
+  pre:
+    #@ set logging only to >= warning.
+    - npm config set loglevel warn
+    - . build/ci/dependencies/paver-setup.sh
+
+  override:
+    - pyenv exec paver bootstrap_backend;
+    - pyenv exec paver bootstrap_client;
+    # - pyenv exec paver bootstrap
+    # - pyenv exec paver build
+
+    # # seed the database with test data
+    # - pyenv exec paver serve
+    # - pyenv exec paver dbseed
+    # - pyenv exec paver stop
 
 
 test:
   override:
     #@ execute client functional & unit tests
-    - paver test_client
+    - pyenv exec paver test_client
 
     #@ execute python functional & integration tests
-    - paver test_backend --mode integration
+    - pyenv exec paver test_backend --mode integration
 
     #@ execute casperjs end-to-end tests
-    - paver test_headless_browser
+    - pyenv exec paver test_headless_browser
 
 
 deployment:
@@ -50,14 +65,14 @@ deployment:
   integration:
     branch: develop
     commands:
-      - paver dist   --env_id integration
-      - paver deploy --default
-      - paver dbseed --env_id integration
+      - pyenv exec paver dist   --env_id integration
+      - pyenv exec paver deploy --default
+      - pyenv exec paver dbseed --env_id integration
 
   #@ deploy prod branch to qa environment
   qa:
     branch: prod
     commands:
-      - paver dist   --env_id qa
-      - paver deploy --default
-      - paver dbseed --env_id qa
+      - pyenv exec paver dist   --env_id qa
+      - pyenv exec paver deploy --default
+      - pyenv exec paver dbseed --env_id qa

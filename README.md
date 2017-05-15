@@ -1,29 +1,77 @@
-grgrynch
+GRGRYNCH
 ========
 
-source code for [gregorynicholas.com](http://gregorynicholas.com)
+source code for [GREGORYNICHOLAS.com](http://gregorynicholas.com).
 
-<br />
+[![circleci](https://circleci.com/gh/gregorynicholas/grgrynch.svg?style=svg)](https://circleci.com/gh/gregorynicholas/grgrynch)
+
 
 -----
+<br>
+<br>
+
 
 * i: [INSTALL.md](docs/INSTALL.md)
 * ii: [QUICKSTART.md](docs/QUICKSTART.md)
 * iii: [CLIENT.md](docs/CLIENT.md)
 
+
 -----
+<br>
+<br>
 
-<br />
+
+### LOCAL ENVIRONMENT SETUP:
 
 
-quick'n'dirty shell install commands:
+#### PYENV INSTALL, SETUP:
 
-    $ mkvirtualenv --no-site-packages grgrynch
-    $ pip install -r requirements.txt
-    $ paver bootstrap
-    $ paver gae:install_sdk
-    $ paver bootstrap_init_dirs
-    $ paver gae:datastore_init
-    $ paver gae:server_run
-    $ paver gae:server_tail
-    $ paver gae:server_stop
+```sh
+export PYENV_ROOT="$HOME/.pyenv";
+export PATH="$PYENV_ROOT/bin:$PATH";
+
+[[ ! -d "$PYENV_ROOT" ]] && git clone https://github.com/pyenv/pyenv.git "$PYENV_ROOT";
+[[ ! -d "$(pyenv root)/plugins/pyenv-virtualenv" ]] && git clone https://github.com/pyenv/pyenv-virtualenv.git $(pyenv root)/plugins/pyenv-virtualenv;
+pyenv rehash;
+eval "$(pyenv init -)" && eval "$(pyenv virtualenv-init -)";
+
+```
+
+#### PYENV-VIRTUALENV SETUP, CONFIG:
+
+```sh
+pyenv virtualenv 2.7.11 GRGRYNCH-2.7.11;
+pyenv activate GRGRYNCH-2.7.11;
+pyenv exec pip install pip --upgrade --quiet;
+pyenv exec pip install --disable-pip-version-check --verbose -r $REPO_ROOT/build/pip-paver-deps.txt;
+pyenv exec pip install --disable-pip-version-check --verbose -r $REPO_ROOT/build/pip-paver.txt;
+```
+
+```sh
+# pyenv exec paver bootstrap;
+pyenv exec paver bootstrap_backend;
+pyenv exec paver bootstrap_client;
+# pyenv exec paver bootstrap_init_dirs;
+pyenv exec paver gae:install_sdk;
+pyenv exec paver gae:datastore_init;
+```
+
+
+#### run shell commands:
+
+```sh
+pyenv activate GRGRYNCH-2.7.11;
+pyenv exec paver gae:server_run;
+pyenv exec paver gae:server_tail;
+pyenv exec paver gae:server_stop;
+```
+
+
+-----
+<br>
+<br>
+
+
+```sh
+$ appcfg.py -A grgrynch-dev-01 -v v0-0-1 download_app ../deployed;
+```
