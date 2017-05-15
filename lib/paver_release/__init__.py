@@ -23,7 +23,7 @@ __all__ = [
 
 def version_tag_id():
   """
-  returns a semantic version string of the most recently created git tag.
+    :returns: string version number of the newest git tag
   """
   tags = git.tags()
   if len(tags) < 1:

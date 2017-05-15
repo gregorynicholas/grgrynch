@@ -1,6 +1,8 @@
 {
   "name": "app-client",
+  "description": "app client.",
   "version": "0.0.1",
+  "readmeFilename": "README.md",
   "devDependencies": {
     "grunt": "~0.4.1",
     "grunt-contrib-watch": "~0.3.1",

@@ -122,6 +122,7 @@ def bootstrap_client():
   sets up the client development environment.
   """
   rm(opts.proj.dirs.client / "node_modules")
+  sh("nvm use 0.10.26")
   sh("npm install -g grunt grunt-cli bower stylus coffee-script")
   sh("npm install", cwd=opts.proj.dirs.client)
   sh("bower install", cwd=opts.proj.dirs.client)
@@ -162,7 +163,9 @@ def clean():
   rm(opts.proj.dirs.build,
      opts.proj.dirs.dist,
      opts.proj.dirs.deploy)
+
   # [os.remove(f) for f in opts.proj.dirs.base.walkfiles("*.yaml")]
+
   [os.remove(f) for f in opts.proj.dirs.app.walkfiles("*.py[co]")]
 
 
@@ -172,6 +175,22 @@ def build_casperjs_tests():
   builds casperjs tests.
   """
   sh("grunt build_casperjs", cwd=opts.proj.dirs.client)
+
+
+@task
+def build_server():
+  """
+  builds the server.
+  """
+  dest = opts.proj.dirs.base
+  # env_id = options.get("env_id", opts.proj.envs.local)
+  env_id = opts.proj.envs.local
+  ver_id = release.dist_version_id()
+
+  gae.descriptor.build_descriptors(
+    dest=dest,
+    env_id=env_id,
+    ver_id=ver_id)
 
 
 @task
@@ -199,7 +218,8 @@ def build(options):
   """
   env_id = options.get("env_id", opts.proj.envs.local)
   ver_id = release.dist_version_id()
-  dest = opts.proj.dirs.base
+  print('env-id: {}'.format(env_id))
+  print('ver-id: {}'.format(ver_id))
 
   # STEP 1
   # ------
@@ -214,11 +234,8 @@ def build(options):
 
   # STEP 3
   # ------
-  # build the app engine descriptors..
-  gae.descriptor.build_descriptors(
-    dest=dest,
-    env_id=env_id,
-    ver_id=ver_id)
+  # build the app-engine descriptors..
+  call_task("build_server")
 
   print("---> build success\n")
 

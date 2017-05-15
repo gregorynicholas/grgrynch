@@ -16,6 +16,8 @@ machine:
     # - mongodb
   environment:
     # PYENV_ROOT: "$HOME/.pyenv"
+    GCLOUD_PROJECT_ID: grgrynch
+    GCLOUD_PROJECT_NO: 466510373200
 
 
 ## unused stage..
@@ -40,6 +42,8 @@ dependencies:
     - pyenv exec paver bootstrap_client;
     # - pyenv exec paver bootstrap
     # - pyenv exec paver build
+    # - pyenv exec paver build_client
+    # - pyenv exec paver build_server
 
     # # seed the database with test data
     # - pyenv exec paver serve

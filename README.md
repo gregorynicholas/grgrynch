@@ -67,6 +67,7 @@ pyenv exec paver gae:datastore_init;
 ```sh
 pyenv activate GRGRYNCH-2.7.11;
 pyenv exec paver build;
+pyenv exec paver build_client;
 pyenv exec paver gae:server_run;
 pyenv exec paver gae:server_tail;
 pyenv exec paver gae:server_stop;
