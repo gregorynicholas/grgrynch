@@ -19,9 +19,16 @@ from paver.easy import sh2 as sh
 
 
 __all__ = [
-  "sh", "pop_sh_kwargs", "sym", "rm", "file_to_utf8", "yaml_load",
-  "rbunch", "rpath",
-  "parse_cmd_flags", "to_flags",
+  "parse_cmd_flags",
+  "pop_sh_kwargs",
+  "to_flags",
+  "sh",
+  "sym",
+  "rm",
+  "file_to_utf8",
+  "yaml_load",
+  "rbunch",
+  "rpath",
 ]
 
 
@@ -44,13 +51,13 @@ def parse_cmd_flags(args=None, flags=None):
 
 def pop_sh_kwargs(kwargs):
   """
-  returns `sh`'s' kwargs popped out into a list.
+  returns global command options popped to a list with defaults.
   """
-  std_kwargs = {
-    'capture': True,
-    'error': False,
-    'quiet': False,
-  }
+  std_kwargs = dict(
+    capture=True,
+    error=False,
+    quiet=False,
+  )
   return [kwargs.pop(kwarg, val) for kwarg, val in std_kwargs.iteritems()]
 
 
@@ -115,7 +122,11 @@ def sym(src, dest):
     :param src: instance of a `paver.easy.path` object.
     :param dest: instance of a `paver.easy.path` object.
   """
-  rm(dest)  # TODO: unlink..
+
+  # if dest.is_link():
+  #   sh('unlink {}'.format(dest))
+
+  rm(dest)  #: <TODO> use `unlink`..
   return src.symlink(dest)
 
 

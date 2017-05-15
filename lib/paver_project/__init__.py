@@ -18,7 +18,10 @@ from paver.easy import path as pth
 from paver.easy import options as opts
 
 
-__all__ = ["proj", "opts"]
+__all__ = [
+  'proj',
+  'opts',
+]
 
 
 def load(config_path):

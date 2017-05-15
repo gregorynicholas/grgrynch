@@ -32,10 +32,12 @@ def install(packages, group='runtime'):
   elif isinstance(packages, str):
     packages = [packages]
 
+  log = 'pip-install.log'
+
   return sh(
-    "pip install --disable-pip-version-check {packages}",
+    "pip install --disable-pip-version-check --log {log} {packages}",
     packages=" ".join(packages),
-    cache=opts.proj.dirs.base / ".pip",
+    log=log,
     cwd=opts.proj.dirs.base)
 
 
@@ -71,10 +73,16 @@ def get_installed_top_level_files(packages):
     :param packages:
     :returns:
   """
-  venvlib = opts.proj.dirs.venv / "lib/python2.7/site-packages"
+  venv_sitepackages = opts.proj.dirs.venv / "lib/python2.7/site-packages"
   runtimes = get_normalized_package_names(packages)
+
+  print('''
+  site-packages: {}
+  runtimes: {}
+  '''.format(venv_sitepackages, pformat(runtimes)))
+
   rv = []
-  for egg in venvlib.walkdirs("*.egg-info"):
+  for egg in venv_sitepackages.walkdirs("*.egg-info"):
     dist = Distribution.from_location(egg, basename=str(egg.name))
 
     if _normalize(dist.project_name) not in runtimes:
@@ -84,7 +92,7 @@ def get_installed_top_level_files(packages):
     toplevels.remove("")
 
     for tlevel in [_ for _ in toplevels if _ != "tests"]:
-      _path = venvlib / tlevel
+      _path = venv_sitepackages / tlevel
 
       if not _path.isdir():
         tlevel += ".py"
@@ -92,6 +100,6 @@ def get_installed_top_level_files(packages):
       else:
         pass
 
-      rv.append(venvlib / tlevel)
+      rv.append(venv_sitepackages / tlevel)
 
   return rv

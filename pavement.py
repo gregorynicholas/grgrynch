@@ -23,7 +23,6 @@ from paver.ext.utils import yaml_load
 from paver.ext.utils import file_to_utf8
 from paver.ext.utils import rm
 from paver.ext.utils import sh
-from paver.ext.utils import sym
 
 from paver.easy import BuildFailure
 from paver.easy import task, call_task, cmdopts
@@ -68,11 +67,11 @@ def _validate_env_id(options, optional=False):
 
 
 def _bootstrap_init_dirs():
-  opts.proj.dirs.data.root.makedirs()
-  opts.proj.dirs.dist.makedirs()
-  opts.proj.dirs.build.makedirs()
-  opts.proj.dirs.lint.root.makedirs()
-  opts.proj.dirs.lint.reports.makedirs()
+  opts.proj.dirs.data.root.makedirs_p()
+  opts.proj.dirs.dist.makedirs_p()
+  opts.proj.dirs.build.makedirs_p()
+  opts.proj.dirs.lint.root.makedirs_p()
+  opts.proj.dirs.lint.reports.makedirs_p()
 
 
 def _load_dependencies_config():
@@ -89,8 +88,20 @@ def _install_pip_packages():
   print 'installing runtime pip dependency packages..'
   pip.install(packages, 'runtime')
 
-  print 'installing gae runtime libs..'
-  gae.install_runtime_libs(packages, opts.proj.dirs.lib)
+
+def _install_appengine_sdk():
+  print 'installing app-engine sdk..'
+  gae.sdk.install_sdk()
+
+  print 'installing third-party libs to work with app-engine runtime sdk..'
+  gae.sdk.install_runtime_libs(packages, opts.proj.dirs.lib)
+
+
+def _install_gcloud_sdk():
+  base_url = 'https://dl.google.com/dl/cloudsdk/channels/rapid/downloads'
+  file_url_path = 'google-cloud-sdk-155.0.0-darwin-x86_64.tar.gz'
+  url = base_url + '/' + file_url_path
+  # <TODO> .. migrate to using `gcloud` ..
 
 
 @task
@@ -99,8 +110,10 @@ def bootstrap_server():
   backend server setup + install.
   also configures 3rd party external python dependencies.
   """
-  opts.proj.dirs.lib.makedirs()
+  opts.proj.dirs.lib.makedirs_p()
   _install_pip_packages()
+  _install_appengine_sdk()
+  # _install_gcloud_sdk()
 
 
 @task

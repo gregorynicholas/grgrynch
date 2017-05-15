@@ -4,17 +4,23 @@
 
   paver extension for linting + static analysis.
 
-  happily sourced from:
-  github.com/shazow/workerpool/blob/master/check.py
+  @see github.com/shazow/workerpool/blob/master/check.py
 
 
   :copyright: (c) 2014 by gregorynicholas.
-  :license: MIT, see LICENSE for more details.
+
 """
 from __future__ import unicode_literals
 from paver.easy import task, options as opts
 import pep8
 from pyflakes.scripts import pyflakes
+
+
+__all__ = [
+  'pyflakes',
+  'pep8',
+  'check',
+]
 
 
 def pyflakes(src):

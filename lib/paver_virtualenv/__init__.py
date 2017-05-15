@@ -14,7 +14,10 @@ from paver.easy import options as opts
 from paver.ext import utils
 
 
-__all__ = ["current", "reset_virtualenv"]
+__all__ = [
+  "current",
+  "reset_virtualenv",
+]
 
 
 def current():

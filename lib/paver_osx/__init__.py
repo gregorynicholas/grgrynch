@@ -6,13 +6,16 @@
 
 
   :copyright: (c) 2014 by gregorynicholas.
-  :license: MIT, see LICENSE for more details.
+
 """
 from paver.easy import task
 from paver.ext.utils import sh
 
 
-__all__ = ["clear"]
+__all__ = [
+  'clear',
+  "osascript",
+]
 
 
 @task
@@ -27,7 +30,7 @@ def clear():
 
 def osascript(script):
   """
-  executes applescripts and other osa language scripts
+  executes an applescript string.
   """
   return sh(
     "/usr/bin/open -a Terminal /usr/bin/osascript -e '{script}'",

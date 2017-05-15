@@ -29,9 +29,13 @@ source code for [GREGORYNICHOLAS.com](http://gregorynicholas.com).
 ```sh
 export PYENV_ROOT="$HOME/.pyenv";
 export PATH="$PYENV_ROOT/bin:$PATH";
+export PYENV_VIRTUALENV_VERBOSE_ACTIVATE=1;
 
 [[ ! -d "$PYENV_ROOT" ]] && git clone https://github.com/pyenv/pyenv.git "$PYENV_ROOT";
 [[ ! -d "$(pyenv root)/plugins/pyenv-virtualenv" ]] && git clone https://github.com/pyenv/pyenv-virtualenv.git $(pyenv root)/plugins/pyenv-virtualenv;
+[[ ! -d "$(pyenv root)/plugins/pyenv-pip-rehash" ]] && git clone https://github.com/yyuu/pyenv-pip-rehash.git $(pyenv root)/plugins/pyenv-pip-rehash;
+[[ ! -d "$(pyenv root)/plugins/pyenv-default-packages" ]] && git clone https://github.com/jawshooah/pyenv-default-packages.git $(pyenv root)/plugins/pyenv-default-packages;
+
 pyenv rehash;
 eval "$(pyenv init -)" && eval "$(pyenv virtualenv-init -)";
 
@@ -47,11 +51,12 @@ pyenv exec pip install --disable-pip-version-check --verbose -r ./build/pip-pave
 pyenv exec pip install --disable-pip-version-check --verbose -r ./build/pip-paver.txt;
 ```
 
+# see https://github.com/GoogleCloudPlatform/continuous-deployment-circle/blob/master/circle.yml
+
 ```sh
 # pyenv exec paver bootstrap;
 pyenv exec paver bootstrap_server;
 pyenv exec paver bootstrap_client;
-# pyenv exec paver bootstrap_init_dirs;
 pyenv exec paver gae:install_sdk;
 pyenv exec paver gae:datastore_init;
 ```
@@ -61,6 +66,7 @@ pyenv exec paver gae:datastore_init;
 
 ```sh
 pyenv activate GRGRYNCH-2.7.11;
+pyenv exec paver build;
 pyenv exec paver gae:server_run;
 pyenv exec paver gae:server_tail;
 pyenv exec paver gae:server_stop;

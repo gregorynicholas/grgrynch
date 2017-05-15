@@ -6,13 +6,19 @@
 
 
   :copyright: (c) 2013 by gregorynicholas.
-  :license: MIT, see LICENSE for more details.
+
 """
 from __future__ import unicode_literals
 from paver.easy import options as opts
 from paver.easy import task, BuildFailure
 from paver.ext import daemon
 from paver.ext.utils import sh
+
+
+__all__ = [
+  'run',
+  'stop',
+]
 
 
 @task

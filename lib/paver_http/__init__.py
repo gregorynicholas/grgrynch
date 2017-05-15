@@ -6,13 +6,18 @@
 
 
   :copyright: (c) 2014 by gregorynicholas.
-  :license: MIT, see LICENSE for more details.
+
 """
 import urllib2
 import time
 from paver.ext.utils import sh
 
-__all__ = ["wget", "ping", "PingError", "health_check"]
+__all__ = [
+  "wget",
+  "ping",
+  "health_check",
+  "PingError",
+]
 
 
 class PingError(ValueError):
@@ -71,4 +76,4 @@ def curl(src, dest, callback=None):
     :param callback (todo): move the DL to non-blocking, and invoke
       callback function on done.
   """
-  # todo
+  # <TODO>

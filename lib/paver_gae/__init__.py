@@ -2,41 +2,66 @@
   paver.ext.gae
   ~~~~~~~~~~~~~
 
-  paver extension for google app engine.
+  paver extension for working with google's app-engine sdk.
 
 
   :copyright: (c) 2014 by gregorynicholas.
-  :license: MIT, see LICENSE for more details.
+
 """
 from __future__ import unicode_literals
 from jinja2 import Environment
 from jinja2.loaders import DictLoader
 
-from paver.easy import Bunch, cmdopts
+from paver.easy import Bunch, options as opts
+from paver.easy import cmdopts
 from paver.easy import task, call_task
 from paver.easy import BuildFailure
-from paver.ext.project import opts
-from paver.ext import supervisor, pip
-from paver.ext import release, utils
-from paver.ext.utils import rm, sh
 
+from paver.ext.project import opts
+from paver.ext import supervisor
+from paver.ext import release
+from paver.ext import utils
+from paver.ext.utils import rm
+from paver.ext.utils import sh
+
+from paver.ext.gae import sdk
+from paver.ext.gae import remote_api
 from paver.ext.gae import descriptor
 from paver.ext.gae.appcfg import appcfg
-from paver.ext.gae.backends import *
+
+from paver.ext.gae.backends import get_backends
+from paver.ext.gae.backends import backends
+from paver.ext.gae.backends import backends_deploy
+from paver.ext.gae.backends import backends_rollback
+
 from paver.ext.gae.cron import *
 from paver.ext.gae.dos import *
 from paver.ext.gae.index import *
 from paver.ext.gae.queue import *
-from paver.ext.gae.sdk import *
 from paver.ext.gae.oauth2 import *
 
 
 __all__ = [
-  "appcfg", "install_runtime_libs", "descriptor", "killall", "datastore_init",
-  "server_run", "server_stop", "server_restart", "server_tail",
-  "deploy", "deploy_branch", "update_indexes", "open_admin",
-  "backends", "backends_rollback", "backends_deploy", "get_backends",
+  "appcfg",
+  "descriptor",
+  "killall",
+  "datastore_init",
+  "server_run",
+  "server_stop",
+  "server_restart",
+  "server_tail",
+  "deploy",
+  "deploy_branch",
+  "update_indexes",
+  "open_admin",
+
+  "get_backends",
+  "backends",
+  "backends_deploy",
+  "backends_rollback",
+
   "ServerStartFailure",
+  "SdkServerNotRunningFailure",
 ]
 
 
@@ -45,7 +70,7 @@ opts(
     sdk=Bunch(
       root=opts.proj.dirs.venv / opts.proj.dev_appserver.ver,
     ),
-    dev_appserver=opts.proj.dev_appserver
+    dev_appserver=opts.proj.dev_appserver,
   ))
 
 
@@ -82,26 +107,6 @@ def _parse_flags(cfg):
   """
   flags = utils.parse_cmd_flags(cfg["args"], cfg["flags"])
   return "{}/dev_appserver.py {} .".format(opts.gae.sdk.root, flags)
-
-
-def install_runtime_libs(packages, dest):
-  """
-  since app engine doesn't allow for fucking pip installs, we have to symlink
-  the libs to a local project directory. we could do 2 separate pip installs,
-  but that shit gets slow as fuck.
-
-    :todo: zip each lib inside of the lib dir to serve third party libs
-  """
-  for f in pip.get_installed_top_level_files(packages):
-    # print "sym linking: ", f
-    _path = dest / f.name
-
-    # symlink the path
-    f.sym(_path)
-
-    # ensure there's an `__init__.py` file in package roots
-    if _path.isdir() and not (_path / "__init__.py").exists():
-      (_path / "__init__.py").touch()
 
 
 @task
@@ -172,11 +177,12 @@ def datastore_init():
   """
   cleans + creates the local app engine sdk server blobstore & datastore.
   """
-  rm(opts.proj.dirs.data.datastore,
-     opts.proj.dirs.data.blobstore)
-  opts.proj.dirs.data.blobstore.makedirs()
-  opts.proj.dirs.data.datastore.makedirs()
+  rm(opts.proj.dirs.data.datastore, opts.proj.dirs.data.blobstore)
+
+  opts.proj.dirs.data.blobstore.makedirs_p()
+  opts.proj.dirs.data.datastore.makedirs_p()
   opts.proj.dirs.data.datastore_file.touch()
+
   print("---> datastore_init success\n")
 
 
@@ -210,11 +216,12 @@ def server_run(options):
   )
   template = (opts.proj.dirs.buildconfig / 'supervisord.template.conf').text()
 
+  #: render the supervisor config template..
   jinjaenv = Environment(loader=DictLoader(
     {'supervisord.template.conf': str(template)}
   ))
+  descriptor.render_jinja_templates(jinjaenv, context, dest=opts.proj.dirs.base)
 
-  descriptor.render_jinjaenv(jinjaenv, context, opts.proj.dirs.base)
   supervisor.start()
 
   stdout = supervisor.run('devappserver-{}'.format(env_id))

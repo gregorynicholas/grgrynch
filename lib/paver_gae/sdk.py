@@ -2,36 +2,48 @@
   paver.ext.gae.sdk
   ~~~~~~~~~~~~~~~~~
 
-  gae sdk version manager.
+  paver extension for working with google-cloud app-engine sdk.
 
 
   :copyright: (c) 2014 by gregorynicholas.
-  :license: MIT, see LICENSE for more details.
+
 """
 from __future__ import unicode_literals
 from paver.easy import task
-from paver.easy import BuildFailure, path
+from paver.easy import BuildFailure
+from paver.easy import path
 from paver.easy import options as opts
-from paver.ext import http, archives
-from paver.ext.utils import rm, sh
+from paver.ext import archives
+from paver.ext import http
+from paver.ext import pip
+from paver.ext import virtualenv
+from paver.ext.utils import rm
+from paver.ext.utils import sh
 
 
-__all__ = ['install_sdk', 'install_mapreduce_lib']
+__all__ = [
+  'install_sdk',
+  'install_runtime_libs',
+  'install_mapreduce_lib',
+]
 
 
 @task
 def install_sdk():
   """
-  installs the app engine sdk to the virtualenv.
+  installs the app-engine sdk, to the virtualenv root dir.
   """
-  # todo: add a "force" option to override cache
+  #: <TODO> add a "force" option to override cache
   archive = path(opts.gae.dev_appserver.ver + ".zip")
   if not (opts.proj.dirs.venv / archive).exists():
     http.wget(
       opts.gae.dev_appserver.src + archive.name, opts.proj.dirs.venv)
 
-  rm(opts.gae.sdk.root)
-  # todo: replaces with archives call.
+  if opts.gae.sdk.root.exists():
+    #: <TODO> add interactive confirm ..?
+    rm(opts.gae.sdk.root)
+
+  #: <TODO> replaces with archives call.
   sh(
     """
     unzip -d ./ -oq {archive} && mv ./google_appengine {sdk_root}
@@ -44,25 +56,54 @@ def install_sdk():
   if not opts.gae.sdk.root.exists():
     raise BuildFailure("shit didn't download + extract the lib properly.")
 
-  # integrate the app engine sdk with virtualenv
-  pth_path = opts.proj.dirs.venv / "lib/python2.7/site-packages/gaesdk.pth"
-  pth_path.write_lines([
+  _write_venv_pth()
+  _write_post_activate_v2()
+
+
+def _write_venv_pth():
+  '''
+  integrates the app-engine sdk with virtualenv ..
+  '''
+  venv_pth_file = opts.gae.dev_appserver.ver + ".pth"
+  site_packages = opts.proj.dirs.venv / "lib/python2.7/site-packages"
+  venv_pth_file = site_packages / venv_pth_file
+
+  venv_pth_file.write_lines([
     opts.gae.sdk.root.abspath(),
     "import dev_appserver",
     "dev_appserver.fix_sys_path()"])
 
-  # use virtualenv hooks to add gae's sdk to the exec path
+
+def _write_post_activate_v2():
+  '''
+  use virtualenv hooks to add gae's sdk to the exec path
+  '''
+  activate = opts.proj.dirs.base / ".env"
+  activate.write_lines([
+    '',
+    'echo "exec path adjusted for {}.." '.format(opts.gae.dev_appserver.ver),
+    'export PATH="{}":"$PATH" '.format(opts.gae.sdk.root),
+    '',
+  ], append=True)
+
+
+def _write_post_activate_v1():
+  '''
+  use virtualenv hooks to add gae's sdk to the exec path
+  '''
   postactivate = opts.proj.dirs.venv / "bin/postactivate"
   postactivate.write_lines([
-    "#!/usr/bin/env bash",
-    "echo \"exec path adjusted for google_appengine_1.8.9\"",
-    "export PATH=\"{}\":$PATH".format(opts.gae.sdk.root)])
+    '#!/usr/bin/env bash',
+    'echo "exec path adjusted for {}.." '.format(opts.gae.dev_appserver.ver),
+    'export PATH="{}":"$PATH" '.format(opts.gae.sdk.root),
+    '',
+  ], append=True)
 
 
 @task
 def install_mapreduce_lib():
   """
-  installs google app engine's mapreduce library.
+  installs app-engine mapreduce library.
   (http://github.com/gregorynicholas/appengine-mapreduce)
   """
   if (opts.proj.dirs.lib / "mapreduce.zip").exists():
@@ -86,3 +127,28 @@ def install_mapreduce_lib():
    ).move(opts.proj.dirs.lib)
 
   rm(opts.proj.dirs.lib / "appengine-mapreduce-master")
+
+
+def install_runtime_libs(packages, dest):
+  """
+  since app engine doesn't allow for fucking pip installs, we have to symlink
+  the libs to a local project directory. we could do 2 separate pip installs,
+  but that shit gets slow as fuck.
+
+  <TODO> we could zip each third-party lib dir within ./lib + use zipimport
+
+  """
+
+  print("  INSTALLING RUNTIME LIBS TO: {}".format(dest))
+
+  for f in pip.get_installed_top_level_files(packages):
+    print("  - sym linking:  {}".format(f))
+
+    _path = dest / f.name
+
+    #: symlink the path
+    f.sym(_path)
+
+    #: ensure there's an `__init__.py` file in package roots
+    if _path.isdir() and not (_path / "__init__.py").exists():
+      (_path / "__init__.py").touch()
