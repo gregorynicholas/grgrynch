@@ -46,7 +46,15 @@ def _normalize(name):
   normalizes the file name of a package.
   """
   #: <TODO> check for "egg" vs "dist"
-  return name.split("==")[0].split("#egg=")[-1].replace("-", "_").lower()
+  _sep = '=='
+
+  if '>=' in name:
+    _sep = '>='
+
+  elif '<=' in name:
+    _sep = '<='
+
+  return name.split(_sep)[0].split("#egg=")[-1].replace("-", "_").lower()
 
 
 def get_normalized_package_names(packages):
@@ -73,26 +81,40 @@ def get_installed_top_level_files(packages):
     :param packages:
     :returns:
   """
-  venv_sitepackages = opts.proj.dirs.venv / "lib/python2.7/site-packages"
+  venvpkgs = opts.proj.dirs.venv / "lib/python2.7/site-packages"
   runtimes = get_normalized_package_names(packages)
 
   print('''
   site-packages: {}
   runtimes: {}
-  '''.format(venv_sitepackages, pformat(runtimes)))
+  '''.format(venvpkgs, pformat(runtimes)))
 
   rv = []
-  for egg in venv_sitepackages.walkdirs("*.egg-info"):
-    dist = Distribution.from_location(egg, basename=str(egg.name))
+  _dirs = [venvpkgs.walkdirs("*.egg-info"), venvpkgs.walkdirs("*.dist-info")]
+  _eggs = []
 
-    if _normalize(dist.project_name) not in runtimes:
+  for _gen in _dirs:
+    for _dir in _gen:
+      _eggs.append(_dir)
+
+  print('_eggs: {}'.format(pformat(_eggs)))
+
+  for _egg in _eggs:
+    print('_egg: {}'.format(_egg))
+
+    dist = Distribution.from_location(_egg, basename=str(_egg.name))
+    _name = _normalize(dist.project_name)
+
+    print('_name: {}'.format(_name))
+
+    if _name not in runtimes:
       continue
 
-    toplevels = (egg / "top_level.txt").text().split("\n")
+    toplevels = (_egg / "top_level.txt").text().split("\n")
     toplevels.remove("")
 
     for tlevel in [_ for _ in toplevels if _ != "tests"]:
-      _path = venv_sitepackages / tlevel
+      _path = venvpkgs / tlevel
 
       if not _path.isdir():
         tlevel += ".py"
@@ -100,6 +122,6 @@ def get_installed_top_level_files(packages):
       else:
         pass
 
-      rv.append(venv_sitepackages / tlevel)
+      rv.append(venvpkgs / tlevel)
 
   return rv

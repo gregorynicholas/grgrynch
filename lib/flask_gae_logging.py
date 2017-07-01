@@ -12,7 +12,7 @@
     register_ereporter()
 
 
-  :copyright: (c) 2013 by gregorynicholas.
+  :copyright: (c) by gregorynicholas.
 
 """
 import logging

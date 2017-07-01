@@ -9,8 +9,6 @@
 
 """
 from __future__ import unicode_literals
-from jinja2 import Environment
-from jinja2.loaders import DictLoader
 
 from paver.easy import Bunch, options as opts
 from paver.easy import cmdopts
@@ -60,6 +58,7 @@ __all__ = [
   "backends_deploy",
   "backends_rollback",
 
+  "supervisor_render_config",
   "ServerStartFailure",
   "SdkServerNotRunningFailure",
 ]
@@ -191,46 +190,73 @@ dev_appserver_config_option = (
                      "dev_appserver.yaml, to run the server with.")
 
 
+def supervisor_render_config(config_id, env_id, ver_id):
+  """
+  generates the supervisord.conf file
+  """
+  context = dict(
+    dev_appserver_command=_parse_flags(_dev_appserver_config(config_id)),
+    app_id=opts.proj.app_id,
+    env_id=env_id,
+    ver_id=ver_id,
+    stdout=_stdout_path(),
+  )
+  supervisor.render_config(context)
+  supervisor.reload_config()
+
+
 @task
 @cmdopts([dev_appserver_config_option])
 def server_run(options):
   """
   starts a google app engine server for local development.
   """
+
   env_id = options.get("env_id", opts.proj.envs.local)
   ver_id = release.dist_version_id()
   config_id = options.get("config_id", "default")
 
+  print('version: {}'.format(ver_id))
+  supervisor.stop('devappsever-{}'.format(env_id))
+
   # if supervisor.is_pid_running(pid):
   #   raise ServerStartFailure("app engine sdk server is already running..")
 
-  dev_appserver_command = _parse_flags(_dev_appserver_config(config_id))
-
-  # generate the supervisord.conf file
-  context = dict(
-    dev_appserver_command=dev_appserver_command,
-    app_id=opts.proj.app_id,
+  #@ generates the supervisord.conf file
+  supervisor_render_config(
+    config_id=config_id,
     env_id=env_id,
     ver_id=ver_id,
-    stdout=_stdout_path(),
   )
-  template = (opts.proj.dirs.buildconfig / 'supervisord.template.conf').text()
 
-  #: render the supervisor config template..
-  jinjaenv = Environment(loader=DictLoader(
-    {'supervisord.template.conf': str(template)}
-  ))
-  descriptor.render_jinja_templates(jinjaenv, context, dest=opts.proj.dirs.base)
+  out = supervisor.start()
+  if "ERROR: ANOTHER PROGRAM" in out.upper():
+    print("[ supervisord:warning ] supervisor daemon already running..")
 
-  supervisor.start()
+  elif "ERROR" in out.upper():
+    raise ServerStartFailure("[ supervisord:error ] failed to start supervisor: {}".format(out))
 
-  stdout = supervisor.run('devappserver-{}'.format(env_id))
+  else:
+    print('[ supervisor ]'.format(out))
 
-  if "ERROR (already started)" in stdout:
-    raise ServerStartFailure("server already running..")
 
-  elif "ERROR" in stdout:
-    raise ServerStartFailure("server already running: {}".format(stdout))
+  out = supervisor.run('devappserver-{}'.format(env_id))
+
+  if "ERROR (ALREADY STARTED)" in out.upper():
+    raise ServerStartFailure("[ supervisord:error ] server already running..")
+
+  elif "ABNORMAL TERMINATION" in out.upper():
+    _sh = 'cat "{}"'.format(opts.proj.dirs.logs / "app.log");
+    _logs = sh(_sh, error=False, capture=True)
+    print(_logs)
+
+    raise ServerStartFailure("[ supervisord:error ] {}".format(out))
+
+  elif "ERROR" in out.upper():
+    raise ServerStartFailure("[ supervisord:error ] {}".format(out))
+
+  else:
+    print(out)
 
 
 @task

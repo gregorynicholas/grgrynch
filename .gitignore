@@ -1,14 +1,12 @@
-#@ build and release folders
+#@ build, release dirs
 bin/
 bin-debug/
 bin-release/
-
-#@ other files and folders
 .settings/
 
 
+#@ compiled code, c-extensions
 *.py[cod]
-#@ C extensions
 *.so
 
 
@@ -25,7 +23,7 @@ develop-eggs
 .installed.cfg
 
 
-#@ mac os files
+#@ osx
 .DS_Store
 
 

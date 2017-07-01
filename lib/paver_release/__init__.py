@@ -43,9 +43,16 @@ def dist_version_id():
   """
   rv = git.current_branch()
   # todo: move this list to project.yaml
-  if rv not in ["develop", "master", "testing"]:
-    return rv
-  return "v" + version_tag_id().replace(".", "-")
+  if rv in ("develop", "master", "testing", "integration", "stage", "qa", "prod"):
+    rv = version_tag_id()
+
+  if not rv.startswith('v-'):
+    rv = "v-{}".format(rv)
+
+  rv = rv.replace(".", "-")
+  print("version-tag: {}".format(rv))
+
+  return rv
 
 
 def write_version_id(ver_id):

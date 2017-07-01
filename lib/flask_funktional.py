@@ -5,7 +5,7 @@
   flask extension which hopes to make functional testing easier.
 
 
-  :copyright: (c) 2015 by gregorynicholas.
+  :copyright: (c) by gregorynicholas.
 
 """
 from __future__ import unicode_literals

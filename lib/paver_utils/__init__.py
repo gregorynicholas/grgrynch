@@ -1,3 +1,4 @@
+# encoding: utf-8
 """
   paver.ext.utils
   ~~~~~~~~~~~~~~~
@@ -9,13 +10,62 @@
 
 """
 from __future__ import unicode_literals
-import os
 import codecs
-import tempfile
-import yaml
+import os
+from os import path as ospath
+from tempfile import mkstemp
+from yaml import safe_load
 from paver.easy import Bunch
 from paver.easy import path
-from paver.easy import sh2 as sh
+
+
+#@ monkeypatch sh to now use shell=True..
+#@ see https://stackoverflow.com/questions/3172470/actual-meaning-of-shell-true-in-subprocess/3172488#3172488
+from paver import easy
+
+def _sh(command, capture=False, ignore_error=False, cwd=None, shell=True):
+  """
+  runs an external command. If capture is True, the output of the
+  command will be captured and returned as a string.  If the command
+  has a non-zero return code raise a BuildFailure. You can pass
+  ignore_error=True to allow non-zero return codes to be allowed to
+  pass silently, silently into the night.  If you pass cwd='some/path'
+  paver will chdir to 'some/path' before exectuting the command.
+  """
+  from subprocess import STDOUT
+  from subprocess import PIPE
+  from subprocess import Popen
+  from sys import getdefaultencoding
+  
+  if not cwd:
+    cwd = os.getcwd()
+
+  def _run():
+    kwargs = {'shell': shell, 'cwd': cwd}
+
+    if capture:
+      kwargs['stderr'] = STDOUT
+      kwargs['stdout'] = PIPE
+
+    p = Popen(command, **kwargs)
+    out = p.communicate()[0]
+
+    if out is not None:
+      out = out.decode(getdefaultencoding(), 'ignore')
+
+    if p.returncode and not ignore_error:
+      if capture and out is not None:
+        easy.error(out)
+      raise easy.BuildFailure("Subprocess return code: %d" % p.returncode)
+
+    if capture:
+      return out
+
+  return easy.dry(command, _run)
+
+
+easy.sh = _sh
+sh = easy.sh2
 
 
 __all__ = [
@@ -79,7 +129,9 @@ def rm(*paths):
   fucking sick of how tedious it is to make a simple `rm` call.
   """
   for p in paths:
-    sh("rm -rf {}", p)
+    if bool(p) and p != '/':
+      _sh = "rm -rf \"{}\"".format(p)
+      sh(_sh)
   return paths
 
 
@@ -104,7 +156,7 @@ def _replace_in_file(file_path, replacements):
   def _replace(_line, _orig, _replace):
     return _line.replace(_orig, _replace).encode("utf-8")
 
-  tmp, tmp_path = tempfile.mkstemp()
+  tmp, tmp_path = mkstemp()
   with open(tmp_path, "wb") as f1:
     with codecs.open(file_path, "r", "utf-8") as f2:
       for line in f2:
@@ -138,7 +190,7 @@ def yaml_load(path):
     raise ValueError('yaml file not found: {}'.format(path))
 
   with open(path, "r") as f:
-    rv = yaml.safe_load(f)
+    rv = safe_load(f)
   return rv
 
 
@@ -158,7 +210,7 @@ def rpath(d):
         rv[k] = Bunch(**rpath(v))
       elif isinstance(v, basestring):
         if v.startswith("~"):
-          v = os.path.expanduser(v)
+          v = ospath.expanduser(v)
         rv[k] = path(v)
   return rv
 

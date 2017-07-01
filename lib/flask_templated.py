@@ -5,8 +5,8 @@
   hoping to make templating easier.
 
 
-  :copyright: (c) 2014 by gregorynicholas.
-  :license: MIT, see LICENSE for more details.
+  :copyright: (c) by gregorynicholas.
+
 """
 from __future__ import unicode_literals
 from functools import wraps

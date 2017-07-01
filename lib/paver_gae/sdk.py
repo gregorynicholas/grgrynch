@@ -37,7 +37,7 @@ def install_sdk():
   archive = path(opts.gae.dev_appserver.ver + ".zip")
   if not (opts.proj.dirs.venv / archive).exists():
     http.wget(
-      opts.gae.dev_appserver.src + archive.name, opts.proj.dirs.venv)
+      '--no-config ' + opts.gae.dev_appserver.src + archive.name, opts.proj.dirs.venv)
 
   if opts.gae.sdk.root.exists():
     #: <TODO> add interactive confirm ..?
@@ -55,6 +55,8 @@ def install_sdk():
 
   if not opts.gae.sdk.root.exists():
     raise BuildFailure("shit didn't download + extract the lib properly.")
+
+  print('opts.gae.sdk.root: {}'.format(opts.gae.sdk.root))
 
   _write_venv_pth()
   _write_post_activate_v2()
@@ -138,7 +140,6 @@ def install_runtime_libs(packages, dest):
   <TODO> we could zip each third-party lib dir within ./lib + use zipimport
 
   """
-
   print("  INSTALLING RUNTIME LIBS TO: {}".format(dest))
 
   for f in pip.get_installed_top_level_files(packages):

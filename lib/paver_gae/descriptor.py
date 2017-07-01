@@ -84,9 +84,9 @@ def _load_descriptors():
   loads yaml descriptor templates and returns an instance of a
   `jinja2.Environment`
   """
-  descriptors = opts.proj.dirs.gae.descriptors.walkfiles("*.yaml")
+  _des = opts.proj.dirs.gae.descriptors.walkfiles("*.yaml")
   rv = Environment(loader=DictLoader(
-    {str(d.name): str(d.text()) for d in descriptors}
+    {str(d.name): str(d.text()) for d in _des}
   ))
   return rv
 
@@ -101,8 +101,8 @@ def _write_descriptor(name, template, context, dest):
     :param dest: instance of a paver.easy.path, string file path to write to
   """
   print('writing descriptor file: {} ({})'.format(name, dest))
-  descriptor = dest / name.replace(".template", "")
-  descriptor.write_text(template.render(**context))
+  _des = dest / name.replace(".template", "")
+  _des.write_text(template.render(**context))
 
 
 def build_descriptors(dest, env_id, ver_id=None):
@@ -137,7 +137,6 @@ def build_descriptors(dest, env_id, ver_id=None):
     builtins=builtins,
     inbound_services=inbound_services,
     runtime=runtime,
-    api_version=api_version,
-  )
+    api_version=api_version)
 
-  render_jinjaenv(_load_descriptors(), context, dest)
+  render_jinja_templates(_load_descriptors(), context, dest)

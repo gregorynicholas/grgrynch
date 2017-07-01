@@ -1,3 +1,4 @@
+# encoding: utf-8
 """
   pavement
   ~~~~~~~~
@@ -33,6 +34,7 @@ from paver.ext import (
   client,
   gae,
   nose,
+  nvm,
   pip,
   release,
   virtualenv)
@@ -75,25 +77,27 @@ def _bootstrap_init_dirs():
 
 
 def _load_dependencies_config():
-  print 'loading pip dependencies config..'
+  print('loading pip dependencies config..')
   return yaml_load(opts.proj.pip_dependencies)
 
 
 def _install_pip_packages():
   packages = _load_dependencies_config()
 
-  print 'installing build pip dependency packages..'
+  print('installing build pip dependency packages..')
   pip.install(packages, 'build')
 
-  print 'installing runtime pip dependency packages..'
+  print('installing runtime pip dependency packages..')
   pip.install(packages, 'runtime')
 
 
 def _install_appengine_sdk():
-  print 'installing app-engine sdk..'
+  packages = _load_dependencies_config()['runtime']
+
+  print('installing app-engine sdk..')
   gae.sdk.install_sdk()
 
-  print 'installing third-party libs to work with app-engine runtime sdk..'
+  print('installing third-party libs to work with app-engine runtime sdk..')
   gae.sdk.install_runtime_libs(packages, opts.proj.dirs.lib)
 
 
@@ -112,8 +116,16 @@ def bootstrap_server():
   """
   opts.proj.dirs.lib.makedirs_p()
   _install_pip_packages()
+  print("---> bootstrap_server success\n")
+
+
+@task
+def bootstrap_server_gae_sdk():
+  """
+  """
   _install_appengine_sdk()
   # _install_gcloud_sdk()
+  print("---> bootstrap_server_gae_sdk success\n")
 
 
 @task
@@ -121,11 +133,20 @@ def bootstrap_client():
   """
   sets up the client development environment.
   """
+  nvm_install = nvm.install()
+  if nvm_install != True:
+    print('nvm.install error:', nvm_install)
+  else:
+    print("---> nvm install success\n")
+
+  sh("nvm use {}".format('0.10.26'), shell=False)
+  return
+
   rm(opts.proj.dirs.client / "node_modules")
-  sh("nvm use 0.10.26")
-  sh("npm install -g grunt grunt-cli bower stylus coffee-script")
+  sh("npm install -g {}".format('grunt@0.4.1 grunt-cli@0.1.8 bower stylus@0.31.0 coffee-script'))
   sh("npm install", cwd=opts.proj.dirs.client)
   sh("bower install", cwd=opts.proj.dirs.client)
+  print("---> bootstrap_client success\n")
 
 
 @task
@@ -134,13 +155,13 @@ def bootstrap():
   sets up the project environment.
   """
 
-  print "initializing directories.."
+  print("initializing directories..")
   _bootstrap_init_dirs()
 
-  print "bootstrapping server + build tools.."
+  print("bootstrapping server + build tools..")
   call_task("bootstrap_server")
 
-  print "boostrapping client.."
+  print("boostrapping client..")
   call_task("bootstrap_client")
 
   print("---> bootstrap success\n")
@@ -178,7 +199,7 @@ def build_casperjs_tests():
 
 
 @task
-def build_server():
+def build_server(options):
   """
   builds the server.
   """
@@ -186,6 +207,12 @@ def build_server():
   # env_id = options.get("env_id", opts.proj.envs.local)
   env_id = opts.proj.envs.local
   ver_id = release.dist_version_id()
+
+  gae.supervisor_render_config(
+    config_id=config_id,
+    env_id=env_id,
+    ver_id=ver_id,
+  )
 
   gae.descriptor.build_descriptors(
     dest=dest,
@@ -218,8 +245,11 @@ def build(options):
   """
   env_id = options.get("env_id", opts.proj.envs.local)
   ver_id = release.dist_version_id()
+  config_id = options.get("config_id", "default")
+
   print('env-id: {}'.format(env_id))
   print('ver-id: {}'.format(ver_id))
+  print('config-id: {}'.format(config_id))
 
   # STEP 1
   # ------
@@ -311,32 +341,52 @@ def dist_build(options):
   """
   _validate_env_id(options)
   ver_id = release.dist_version_id()
-  print "version id:", ver_id
+  print("version id:", ver_id)
 
-  # STEP 1
-  # ------
-  # clean up previous build artifacts..
+  #@ STEP 1
+  #@ ------
+  #@ clean up previous build artifacts..
   call_task("clean")
   call_task("build")
 
-  # STEP 2
-  # ------
+  #@ STEP 2
+  #@ ------
   do_not_deploy = (
-    ".data", ".lint", "build", "client", "tests", "docs", "*.py[co]",
-    ".git*", "*.pid", "*.pip", "*.out", "*.err", "*.md", "*.sh", "*.txt",
-    ".coverage", "*.*env", ".DS_Store", "pavement.py", "paver_*",
-    "testsuite", "*_tests.py", "*supervisor*", "logs",
+    "*.py[co]",
+    ".data",
+    ".lint",
+    "build",
+    "client",
+    "tests",
+    "docs",
+    ".git*",
+    "*.pid",
+    "*.pip",
+    "*.out",
+    "*.err",
+    "*.md",
+    "*.sh",
+    "*.txt",
+    ".coverage",
+    "*.*env",
+    ".DS_Store",
+    "pavement.py",
+    "paver_*",
+    "testsuite",
+    "*_tests.py",
+    "*supervisor*",
+    "logs",
 
-    # wtforms
+    #@ wtforms
     "sqlalchemy",
 
-    # mongoengine
+    #@ mongoengine
     "bson", "mongoengine", "pymongo", "flask_mongoengine", "gridfs",
   )
   opts.proj.dirs.base.cp(opts.proj.dirs.dist, ignore=do_not_deploy)
 
-  # STEP 3
-  # ------
+  #@ STEP 3
+  #@ ------
   release.write_ver_id(ver_id)
 
   print("---> dist success\n")
@@ -370,7 +420,9 @@ def dbseed(options):
   """
   env_id = options.get("env_id", opts.proj.envs.local)
   _validate_env_id(options, optional=True)
-  # todo
+
+  # <TODO>
+
   print("---> dbseed success\n")
 
 

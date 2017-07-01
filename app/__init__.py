@@ -9,7 +9,7 @@
   first define: `from __future__ import unicode_literals`
 
 
-  :copyright: (c) 2014 by gregorynicholas.
+  :copyright: (c) by gregorynicholas.
 
 """
 from __future__ import unicode_literals

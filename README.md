@@ -34,7 +34,6 @@ export PYENV_VIRTUALENV_VERBOSE_ACTIVATE=1;
 [[ ! -d "$PYENV_ROOT" ]] && git clone https://github.com/pyenv/pyenv.git "$PYENV_ROOT";
 [[ ! -d "$(pyenv root)/plugins/pyenv-virtualenv" ]] && git clone https://github.com/pyenv/pyenv-virtualenv.git $(pyenv root)/plugins/pyenv-virtualenv;
 [[ ! -d "$(pyenv root)/plugins/pyenv-pip-rehash" ]] && git clone https://github.com/yyuu/pyenv-pip-rehash.git $(pyenv root)/plugins/pyenv-pip-rehash;
-[[ ! -d "$(pyenv root)/plugins/pyenv-default-packages" ]] && git clone https://github.com/jawshooah/pyenv-default-packages.git $(pyenv root)/plugins/pyenv-default-packages;
 
 pyenv rehash;
 eval "$(pyenv init -)" && eval "$(pyenv virtualenv-init -)";
@@ -46,18 +45,29 @@ eval "$(pyenv init -)" && eval "$(pyenv virtualenv-init -)";
 ```sh
 pyenv virtualenv 2.7.11 GRGRYNCH-2.7.11;
 pyenv activate GRGRYNCH-2.7.11;
-pyenv exec pip install pip --upgrade --quiet;
-pyenv exec pip install --disable-pip-version-check --verbose -r ./build/pip-paver-deps.txt;
-pyenv exec pip install --disable-pip-version-check --verbose -r ./build/pip-paver.txt;
+pyenv exec pip install --disable-pip-version-check --verbose --upgrade pip;
+
+# <TODO> how to point to --config ./build/pip.conf
+
+pyenv exec pip install --disable-pip-version-check --verbose -r ./build/requirements/1.0_paver-deps.txt && pyenv rehash;
+pyenv exec pip install --disable-pip-version-check --verbose -r ./build/requirements/2.0_paver.txt && pyenv rehash;
 ```
 
-# see https://github.com/GoogleCloudPlatform/continuous-deployment-circle/blob/master/circle.yml
+
+<TODO>
+    @see https://github.com/GoogleCloudPlatform/continuous-deployment-circle/blob/master/circle.yml
+
+
+#### bootstrap project:
 
 ```sh
-# pyenv exec paver bootstrap;
+#pyenv exec paver bootstrap;
 pyenv exec paver bootstrap_server;
+pyenv rehash;
+pyenv exec paver bootstrap_server_gae_sdk;
+pyenv rehash;
+pyenv exec paver install_sdk;  #< gae.sdk.install_sdk
 pyenv exec paver bootstrap_client;
-pyenv exec paver gae:install_sdk;
 pyenv exec paver gae:datastore_init;
 ```
 
