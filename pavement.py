@@ -40,6 +40,32 @@ from paver.ext import (
   virtualenv)
 
 
+__all__ = [
+  'bootstrap',
+  'bootstrap_client',
+  'bootstrap_server',
+  'bootstrap_server_gae_sdk',
+  'clean',
+  'clean_lib',
+  'build',
+  'build_client',
+  'build_casperjs_tests',
+  'build_server',
+  'dist_build',
+  'dist_release',
+  'lint',
+  'dbseed',
+  'test_client',
+  'test_server',
+  'test_headless_browser',
+]
+
+
+config_id_opt = (
+  "config_id=", "c",
+  "the environment to seed data to. is one of {}.".format(opts.proj.envs))
+
+
 env_id_opt = (
   "env_id=", "e",
   "the environment to seed data to. is one of {}.".format(opts.proj.envs))
@@ -139,13 +165,21 @@ def bootstrap_client():
   else:
     print("---> nvm install success\n")
 
-  sh("nvm use {}".format('0.10.26'), shell=False)
-  return
+  _nvm_sh  = ''
+  _nvm_sh += ' export NVM_DIR="$HOME/.nvm" && . "$NVM_DIR/nvm.sh" >logs/build-client.log 2>&1 && '
+  out = sh('{} nvm install 0.10.40 >logs/build-client.log 2>&1'.format(_nvm_sh), shell=False)
+
+  _nvm_sh += ' nvm use {} >logs/build-client.log 2>&1 '.format('0.10.40')
+  out = sh('{}'.format(_nvm_sh), shell=False)
 
   rm(opts.proj.dirs.client / "node_modules")
-  sh("npm install -g {}".format('grunt@0.4.1 grunt-cli@0.1.8 bower stylus@0.31.0 coffee-script'))
-  sh("npm install", cwd=opts.proj.dirs.client)
-  sh("bower install", cwd=opts.proj.dirs.client)
+
+  # "express": "~3.1.0"
+  _deps = 'grunt@0.4.1 grunt-cli@0.1.8 bower@1.8.0 stylus@0.31.0 coffee-script'
+  out = sh("{} && npm install -g {} >logs/build-client.log 2>&1", _nvm_sh, _deps, shell=False)
+  out = sh("npm install", cwd=opts.proj.dirs.client, shell=False)
+  out = sh("bower install", cwd=opts.proj.dirs.client, shell=False)
+
   print("---> bootstrap_client success\n")
 
 
@@ -207,6 +241,7 @@ def build_server(options):
   # env_id = options.get("env_id", opts.proj.envs.local)
   env_id = opts.proj.envs.local
   ver_id = release.dist_version_id()
+  config_id = options.get("config_id", "default")
 
   gae.supervisor_render_config(
     config_id=config_id,
@@ -225,7 +260,7 @@ def build_client():
   """
   builds the client.
   """
-  sh("grunt dist", cwd=opts.proj.dirs.client)
+  out = sh("grunt dist", cwd=opts.proj.dirs.client, shell=False)
   dest = opts.proj.dirs.base
 
   print("\n---> build_client success: copying artifacts to app..")
@@ -360,6 +395,8 @@ def dist_build(options):
     "tests",
     "docs",
     ".git*",
+    ".download",
+    ".wiki",
     "*.pid",
     "*.pip",
     "*.out",
@@ -387,7 +424,7 @@ def dist_build(options):
 
   #@ STEP 3
   #@ ------
-  release.write_ver_id(ver_id)
+  release.write_version_id(ver_id)
 
   print("---> dist success\n")
 
@@ -399,6 +436,8 @@ def dist_release(options):
   make a release, deploy it to the target environment.
   """
   _validate_env_id(options)
+  ver_id = release.dist_version_id()
+  print("version id:", ver_id)
 
   # build
   call_task("dist_build", options)
@@ -429,3 +468,5 @@ def dbseed(options):
 @task
 def lint():
   call_task("linter:check")
+
+

@@ -5,7 +5,7 @@
   paver extension for dist builds + releasing.
 
 
-  :copyright: (c) 2014 by gregorynicholas.
+  :copyright: (c) 2013 by gregorynicholas.
 
 """
 from __future__ import unicode_literals
@@ -19,6 +19,11 @@ __all__ = [
   "dist_version_id",
   "write_version_id",
 ]
+
+
+envs = (
+  "develop", "master", "testing", "integration", "stage", "qa", "prod",
+)
 
 
 def version_tag_id():
@@ -43,7 +48,7 @@ def dist_version_id():
   """
   rv = git.current_branch()
   # todo: move this list to project.yaml
-  if rv in ("develop", "master", "testing", "integration", "stage", "qa", "prod"):
+  if rv in envs:
     rv = version_tag_id()
 
   if not rv.startswith('v-'):

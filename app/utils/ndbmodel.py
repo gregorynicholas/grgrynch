@@ -5,7 +5,7 @@
   encapsulated helpers to make modeling for appengine-ndb easier.
 
 
-  :copyright: (c) 2014 by gregorynicholas.
+  :copyright: (c) 2013 by gregorynicholas.
 
 """
 from __future__ import unicode_literals

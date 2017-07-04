@@ -72,7 +72,7 @@ pyenv exec paver gae:datastore_init;
 ```
 
 
-#### run shell commands:
+#### build, run commands:
 
 ```sh
 pyenv activate GRGRYNCH-2.7.11;
@@ -83,6 +83,27 @@ pyenv exec paver gae:server_tail;
 pyenv exec paver gae:server_stop;
 ```
 
+
+#### dist, release, deploy commands:
+
+```sh
+
+psgrep() {
+  ps aux | grep "$1" | grep -v "grep";
+};
+
+paver build;
+paver gae:server_stop;
+
+psgrep dev_appserver.py | awk '{print $2}' | xargs kill -9;
+psgrep _python_runtime.py | awk '{print $2}' | xargs kill -9;
+paver gae:server_run;
+
+
+paver dist_build -e qa;
+paver dist_build -e prod;
+paver gae:deploy -d;
+```
 
 -----
 <br>

@@ -125,3 +125,4 @@ client/build/
 
 #@ project wiki
 .WIKI
+.download

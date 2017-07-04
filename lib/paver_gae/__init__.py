@@ -120,12 +120,16 @@ def deploy(options):
   deploys the app to google app engine remote servers.
   """
   ver_id = release.dist_version_id()
-  appcfg(
-    "update -v ",
-    error=False, capture=True, cwd=opts.proj.dirs.dist)
+  set_default     = options.get("set_default", False)
+  clear_cookies   = options.get("clear_cookies", True)
+  deploy_backends = options.get("deploy_backends", False)
 
-  if options.set_default:
-    set_default_serving_version(ver_id)
+
+  appcfg(
+    "update -v ", error=False, capture=True, cwd=opts.proj.dirs.dist)
+
+  # if set_default:
+  #   set_default_serving_version(ver_id)
 
   if options.deploy_backends:
     call_task("backends_deploy")

@@ -9,7 +9,7 @@ machine:
   timezone:
     America/Los_Angeles
   node:
-    version: 0.10.26
+    version: 0.10.40
   python:
     version: 2.7.11
   services:
@@ -38,8 +38,8 @@ dependencies:
     - . build/ci/dependencies/paver-setup.sh
 
   override:
-    - pyenv exec paver bootstrap_server;
-    - pyenv exec paver bootstrap_client;
+    - pyenv exec paver bootstrap_server
+    - pyenv exec paver bootstrap_client
     # - pyenv exec paver bootstrap
     # - pyenv exec paver build
     # - pyenv exec paver build_client
@@ -69,14 +69,22 @@ deployment:
   integration:
     branch: develop
     commands:
-      - pyenv exec paver dist   --env_id integration
+      - pyenv exec paver dist_build --env_id develop
       - pyenv exec paver deploy --default
-      - pyenv exec paver dbseed --env_id integration
+      - pyenv exec paver dbseed --env_id develop
 
   #@ deploy prod branch to qa environment
   qa:
-    branch: prod
+    branch: qa
     commands:
-      - pyenv exec paver dist   --env_id qa
+      - pyenv exec paver dist_build --env_id qa
       - pyenv exec paver deploy --default
       - pyenv exec paver dbseed --env_id qa
+
+  #@ deploy prod branch to qa environment
+  prod:
+    branch: prod
+    commands:
+      - pyenv exec paver dist_build --env_id prod
+      - pyenv exec paver deploy --default
+      - pyenv exec paver dbseed --env_id prod

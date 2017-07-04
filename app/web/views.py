@@ -5,8 +5,8 @@
   this is the base module that will serve the app's views.
 
 
-  :copyright: (c) 2014 by gregorynicholas.
-  :license: MIT, see LICENSE for more details.
+  :copyright: (c) 2013 by gregorynicholas.
+
 """
 from __future__ import unicode_literals
 from logging import getLogger
