@@ -206,7 +206,7 @@ def supervisor_render_config(config_id, env_id, ver_id):
     stdout=_stdout_path(),
   )
   supervisor.render_config(context)
-  supervisor.reload_config()
+  # supervisor.reload_config()
 
 
 @task

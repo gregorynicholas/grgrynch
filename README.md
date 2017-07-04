@@ -11,9 +11,10 @@ source code for [GREGORYNICHOLAS.com](http://gregorynicholas.com).
 <br>
 
 
-* i: [INSTALL.md](docs/INSTALL.md)
-* ii: [QUICKSTART.md](docs/QUICKSTART.md)
-* iii: [CLIENT.md](docs/CLIENT.md)
+* i:   [docs / INSTALL](docs/INSTALL.md)
+* ii:  [docs / QUICKSTART](docs/QUICKSTART.md)
+* iii: [docs / CLIENT](docs/CLIENT.md)
+* iv:  [docs / BUMP](docs/BUMP.md)
 
 
 -----
@@ -87,29 +88,44 @@ pyenv exec paver gae:server_stop;
 #### dist, release, deploy commands:
 
 ```sh
-
-psgrep() {
-  ps aux | grep "$1" | grep -v "grep";
+_kill() {
+  ps aux |  grep "$1" |  grep -v "grep" |  awk '{print $2}' |  xargs kill -9;
 };
 
-paver build;
-paver gae:server_stop;
+pyenv exec paver build;
+pyenv exec paver gae:server_stop;
 
-psgrep dev_appserver.py | awk '{print $2}' | xargs kill -9;
-psgrep _python_runtime.py | awk '{print $2}' | xargs kill -9;
-paver gae:server_run;
+_kill  "dev_appserver.py";
+_kill  "_python_runtime.py";
 
-
-paver dist_build -e qa;
-paver dist_build -e prod;
-paver gae:deploy -d;
+pyenv exec paver gae:server_run;
+supervisorctl start devappserver-local;
 ```
+
+
+```sh
+#@ RELEASE + DEPLOY
+#@@
+pyenv exec paver dist_build --env_id qa;
+pyenv exec paver dist_build --env_id prod;
+
+
+cd .dist/;
+appcfg.py update --no_usage_reporting --skip_sdk_update_check --verbose .;
+cd -;
+#-or-
+pyenv exec paver gae:deploy;
+```
+
+
 
 -----
 <br>
 <br>
 
 
-```sh
-$ appcfg.py -A grgrynch-dev-01 -v v0-0-1 download_app ../deployed;
-```
+
+* i:   [docs / quickstart](docs/QUICKSTART.md)
+* ii:  [docs / environment bootstrapping](docs/INSTALL.md)
+* iii: [docs / client](docs/CLIENT.md)
+* iv:  [docs / versioning](docs/BUMP.md)
