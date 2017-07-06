@@ -1,18 +1,16 @@
-# build and release folders
+#@ build, release dirs
 bin/
 bin-debug/
 bin-release/
-
-# other files and folders
 .settings/
 
 
+#@ compiled code, c-extensions
 *.py[cod]
-# C extensions
 *.so
 
 
-# python packages
+#@ python packages
 *.egg
 *.egg-info
 dist
@@ -25,34 +23,34 @@ develop-eggs
 .installed.cfg
 
 
-# mac os files
+#@ osx
 .DS_Store
 
 
-# installer logs
+#@ installer logs
 pip-log.txt
 
 
-# unit test / coverage reports
+#@ unit test / coverage reports
 .coverage
 nosetests.xml
 app/tests/casperjs/build/
 
 
-# translations
+#@ translations
 *.mo
 
 
-# mr developer
+#@ mr developer
 .project
 .pydevproject
 
 
-# pycharm configuration
+#@ pycharm configuration
 .idea
 
 
-# build output
+#@ build output
 .build
 .dist
 .data
@@ -60,13 +58,13 @@ app/tests/casperjs/build/
 .pip
 
 
-# daemon pid files
+#@ daemon pid files
 *.pid
 *.pid.err
 *.pid.out
 
 
-# app engine descriptor build output
+#@ app-engine descriptor build output
 app.yaml
 backends.yaml
 cron.yaml
@@ -79,7 +77,7 @@ app/web/static
 app/web/templates
 
 
-# library symlinks required for gae
+#@ library symlinks required for gae
 lib/wtforms
 lib/wtforms_json
 lib/werkzeug
@@ -98,7 +96,7 @@ lib/flask_oauth.py
 lib/flask_telegram.py
 lib/flask_telegram_gaemail.py
 lib/flask_telegram_tests.py
-lib/flask_funktional*
+# lib/flask_funktional*
 lib/flask
 lib/raven
 lib/sendgrid
@@ -106,12 +104,12 @@ lib/bson
 lib/blinker
 
 
-# node build output
+#@ node build output
 npm-debug.log
 node_modules
 
 
-# project specific sensitive items
+#@ project specific sensitive items
 secret_keys.py
 keys.py
 build/project.yaml
@@ -123,3 +121,8 @@ supervisord.log
 
 /logs/*
 client/build/
+
+
+#@ project wiki
+.WIKI
+.download

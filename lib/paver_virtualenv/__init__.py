@@ -2,18 +2,22 @@
   paver.ext.virtualenv
   ~~~~~~~~~~~~~~~~~~~~
 
-  paver extension for virtualenv + virtualenvwrapper.
+  paver extension for python virtualenv.
 
 
-  :copyright: (c) 2014 by gregorynicholas.
-  :license: MIT, see LICENSE for more details.
+  :copyright: (c) by gregorynicholas.
+
 """
 from os import environ
 from paver.easy import task
 from paver.easy import options as opts
 from paver.ext import utils
 
-__all__ = ["current", "reset_virtualenv"]
+
+__all__ = [
+  "current",
+  "reset_virtualenv",
+]
 
 
 def current():

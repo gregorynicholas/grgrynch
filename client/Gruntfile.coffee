@@ -119,12 +119,12 @@ module.exports = (grunt) ->
       app:
         src: "#{BUILD_WORKING_DIR}/**/*.coffee"
         dest: "#{BUILD_WORKING_DIR}/app.js"
-      test:
-        src: "#{TEST_DIR}/#{APP_DIR}/**/*.coffee"
-        dest: "#{BUILD_TEST_DIR}/#{APP_DIR}/tests.js"
-      nodeapp:
-        src: "#{NODEAPP_DIR}/**/*.coffee"
-        dest: "#{NODEAPP_BUILD_DIR}/app.js"
+      # test:
+      #   src: "#{TEST_DIR}/#{APP_DIR}/**/*.coffee"
+      #   dest: "#{BUILD_TEST_DIR}/#{APP_DIR}/tests.js"
+      # nodeapp:
+      #   src: "#{NODEAPP_DIR}/**/*.coffee"
+      #   dest: "#{NODEAPP_BUILD_DIR}/app.js"
 
 
     concat:
@@ -201,11 +201,11 @@ module.exports = (grunt) ->
     htmlmin:
       index:
         options:
-          removeComments: true
-          collapseWhitespace: true
+          removeComments: false
+          collapseWhitespace: false
         files:
           "build/dist/index.html": "#{BUILD_DIST_DIR}/index.html"
-          "build/dist/login.html": "#{BUILD_DIST_DIR}/login.html"
+          # "build/dist/login.html": "#{BUILD_DIST_DIR}/login.html"
 
     # minify the js file to be as small as possible
     uglify:
@@ -306,6 +306,7 @@ module.exports = (grunt) ->
   grunt.loadNpmTasks 'grunt-ngmin'
 
 
+
   ###############################################################
   # alias tasks
   ###############################################################
@@ -326,13 +327,15 @@ module.exports = (grunt) ->
    * 10. delete the BUILD_DIR
   ###
   grunt.registerTask "build", [
-    # clear previous build package
+    #@ clear previous build package
     "clean:dist",
 
-    # jquery build
-    "copy", "stylus", "coffee",
+    #@ jquery build
+    "copy",
+    "stylus",
+    "coffee",
 
-    # angularjs build..
+    #@ angularjs build..
     # "copy", "stylus", "coffee", "ngtemplates", "ngmin",
 
     # "jshint",
@@ -343,7 +346,13 @@ module.exports = (grunt) ->
   ]
 
   grunt.registerTask "dist", [
-    "build", "concat", "uglify", "cssmin", "htmlrefs", "htmlmin",
-    # clear built compilation dir
+    "build",
+    "concat",
+    # "uglify",
+    # "cssmin",
+    "htmlrefs",
+    "htmlmin",
+
+    #@ clear build compilation dir
     "clean:working",
   ]

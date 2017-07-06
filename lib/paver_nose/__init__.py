@@ -6,10 +6,15 @@
 
 
   :copyright: (c) 2013 by gregorynicholas.
-  :license: MIT, see LICENSE for more details.
+
 """
 from __future__ import unicode_literals
 from paver.ext.utils import sh
+
+
+__all__ = [
+  'run',
+]
 
 
 def run(path, config, mode, env_id):

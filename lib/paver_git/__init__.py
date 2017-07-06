@@ -6,15 +6,19 @@
 
 
   :copyright: (c) 2014 by gregorynicholas.
-  :license: MIT, see LICENSE for more details.
+
 """
 from __future__ import unicode_literals
-from paver.easy import options as opts, task
+from paver.easy import options as opts
+from paver.easy import task
 from paver.ext.utils import sh
 
 
 __all__ = [
-  "submodule_init", "submodule_update", "current_branch", "tags",
+  "submodule_init",
+  "submodule_update",
+  "current_branch",
+  "tags",
 ]
 
 

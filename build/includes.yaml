@@ -1,0 +1,15 @@
+
+admin_console:
+  pages:
+  - name: mapreduce
+    url: /_ah/mapreduce/
+  - name: pipelines
+    url: /_ah/pipeline/status
+  - name: appstats
+    url: /_ah/appstats
+
+builtins:
+- appstats: on
+- deferred: on
+- remote_api: on
+- admin_redirect: off

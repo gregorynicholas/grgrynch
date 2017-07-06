@@ -6,12 +6,13 @@
 
 
   :copyright: (c) 2014 by gregorynicholas.
-  :license: MIT, see LICENSE for more details.
+
 """
 from __future__ import unicode_literals
 import os
 from paver.easy import Bunch, options as opts, cmdopts
-from paver.easy import task, BuildFailure
+from paver.easy import BuildFailure
+from paver.easy import task
 from paver.ext.utils import sh, rm
 from paver.ext.archives import extract
 

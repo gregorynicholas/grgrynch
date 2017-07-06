@@ -2,7 +2,7 @@
   flask_gae_logging
   ~~~~~~~~~~~~~~~~~
 
-  making logging with flask + app engine apps easier.
+  making logging with flask + app-engine apps easier.
 
 
   if app_config.IS_LOCAL:
@@ -12,13 +12,14 @@
     register_ereporter()
 
 
-  :copyright: (c) 2013 by gregorynicholas.
-  :license: MIT, see LICENSE for more details.
+  :copyright: (c) by gregorynicholas.
+
 """
 import logging
 from logging import Formatter, basicConfig, getLogger
 from google.appengine.ext import ereporter
 from app.config import config as app_config
+
 
 format = '\033[0;34m%(levelname)-7s'
 '\033[0;0m %(filename)s\033[0;0m:\033'

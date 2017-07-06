@@ -5,8 +5,8 @@
   paver extension for dist builds + releasing.
 
 
-  :copyright: (c) 2014 by gregorynicholas.
-  :license: MIT, see LICENSE for more details.
+  :copyright: (c) 2013 by gregorynicholas.
+
 """
 from __future__ import unicode_literals
 # from paver.easy import sh
@@ -14,12 +14,21 @@ from paver.easy import options as opts
 from paver.ext import git
 
 
-__all__ = ["version_tag_id", "dist_version_id"]
+__all__ = [
+  "version_tag_id",
+  "dist_version_id",
+  "write_version_id",
+]
+
+
+envs = (
+  "develop", "master", "testing", "integration", "stage", "qa", "prod",
+)
 
 
 def version_tag_id():
   """
-  returns a semantic version string of the most recently created git tag.
+    :returns: string version number of the newest git tag
   """
   tags = git.tags()
   if len(tags) < 1:
@@ -39,12 +48,19 @@ def dist_version_id():
   """
   rv = git.current_branch()
   # todo: move this list to project.yaml
-  if rv not in ["develop", "master", "testing"]:
-    return rv
-  return "v" + version_tag_id().replace(".", "-")
+  if rv in envs:
+    rv = version_tag_id()
+
+  if not rv.startswith('v-'):
+    rv = "v-{}".format(rv)
+
+  rv = rv.replace(".", "-")
+  print("version-tag: {}".format(rv))
+
+  return rv
 
 
-def write_ver_id(ver_id):
+def write_version_id(ver_id):
   """
   writes the current version identifier (branch name for branch
   deployments, last tag for qa/prod) to `app/version.py`

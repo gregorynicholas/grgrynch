@@ -6,7 +6,7 @@
 
 
   :copyright: (c) 2014 by gregorynicholas.
-  :license: MIT, see LICENSE for more details.
+
 """
 from hashlib import sha256
 from itertools import chain
@@ -15,7 +15,9 @@ from paver.ext.utils import file_to_utf8
 
 
 __all__ = [
-  'copy_page_templates', 'copy_client_build_to_static', 'tag_static_build',
+  'copy_page_templates',
+  'copy_client_build_to_static',
+  'tag_static_build',
 ]
 
 
@@ -29,7 +31,7 @@ def copy_page_templates(root):
     :param root: instance of a `paver.easy.path` object
   """
   dest = root / opts.proj.dirs.app_web_templates
-  dest.makedirs()
+  dest.makedirs_p()
 
   templates = opts.proj.dirs.client_build_dist.walkfiles("*.html")
 
@@ -46,7 +48,7 @@ def copy_client_build_to_static(root):
     :param root: instance of a `paver.easy.path` object
   """
   dest = root / opts.proj.dirs.app_web_static
-  dest.rmtree()
+  dest.rmtree_p()
   opts.proj.dirs.client_build_dist.cp(
     dest, ignore=("*.html", "test*"))
 

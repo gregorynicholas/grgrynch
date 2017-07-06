@@ -2,41 +2,65 @@
   paver.ext.gae
   ~~~~~~~~~~~~~
 
-  paver extension for google app engine.
+  paver extension for working with google's app-engine sdk.
 
 
   :copyright: (c) 2014 by gregorynicholas.
-  :license: MIT, see LICENSE for more details.
+
 """
 from __future__ import unicode_literals
-from jinja2 import Environment
-from jinja2.loaders import DictLoader
 
-from paver.easy import Bunch, cmdopts
+from paver.easy import Bunch, options as opts
+from paver.easy import cmdopts
 from paver.easy import task, call_task
 from paver.easy import BuildFailure
-from paver.ext.project import opts
-from paver.ext import supervisor, pip
-from paver.ext import release, utils
-from paver.ext.utils import rm, sh
 
+from paver.ext.project import opts
+from paver.ext import supervisor
+from paver.ext import release
+from paver.ext import utils
+from paver.ext.utils import rm
+from paver.ext.utils import sh
+
+from paver.ext.gae import sdk
+from paver.ext.gae import remote_api
 from paver.ext.gae import descriptor
 from paver.ext.gae.appcfg import appcfg
-from paver.ext.gae.backends import *
+
+from paver.ext.gae.backends import get_backends
+from paver.ext.gae.backends import backends
+from paver.ext.gae.backends import backends_deploy
+from paver.ext.gae.backends import backends_rollback
+
 from paver.ext.gae.cron import *
 from paver.ext.gae.dos import *
 from paver.ext.gae.index import *
 from paver.ext.gae.queue import *
-from paver.ext.gae.sdk import *
 from paver.ext.gae.oauth2 import *
 
 
 __all__ = [
-  "appcfg", "install_runtime_libs", "descriptor", "killall", "datastore_init",
-  "server_run", "server_stop", "server_restart", "server_tail",
-  "deploy", "deploy_branch", "update_indexes", "open_admin",
-  "backends", "backends_rollback", "backends_deploy", "get_backends",
+  "appcfg",
+  "descriptor",
+  "killall",
+  "datastore_init",
+  "server_run",
+  "server_stop",
+  "server_restart",
+  "server_tail",
+  "deploy",
+  "deploy_branch",
+  "update_indexes",
+  "open_admin",
+
+  "get_backends",
+  "backends",
+  "backends_deploy",
+  "backends_rollback",
+
+  "supervisor_render_config",
   "ServerStartFailure",
+  "SdkServerNotRunningFailure",
 ]
 
 
@@ -45,7 +69,7 @@ opts(
     sdk=Bunch(
       root=opts.proj.dirs.venv / opts.proj.dev_appserver.ver,
     ),
-    dev_appserver=opts.proj.dev_appserver
+    dev_appserver=opts.proj.dev_appserver,
   ))
 
 
@@ -84,26 +108,6 @@ def _parse_flags(cfg):
   return "{}/dev_appserver.py {} .".format(opts.gae.sdk.root, flags)
 
 
-def install_runtime_libs(packages, dest):
-  """
-  since app engine doesn't allow for fucking pip installs, we have to symlink
-  the libs to a local project directory. we could do 2 separate pip installs,
-  but that shit gets slow as fuck.
-
-    :todo: zip each lib inside of the lib dir to serve third party libs
-  """
-  for f in pip.get_installed_top_level_files(packages):
-    # print "sym linking: ", f
-    _path = dest / f.name
-
-    # symlink the path
-    f.sym(_path)
-
-    # ensure there's an `__init__.py` file in package roots
-    if _path.isdir() and not (_path / "__init__.py").exists():
-      (_path / "__init__.py").touch()
-
-
 @task
 @cmdopts([
   ("set-default", "d", "set the current dist version as the default serving "
@@ -116,12 +120,16 @@ def deploy(options):
   deploys the app to google app engine remote servers.
   """
   ver_id = release.dist_version_id()
-  appcfg(
-    "update -v ",
-    error=False, capture=True, cwd=opts.proj.dirs.dist)
+  set_default     = options.get("set_default", False)
+  clear_cookies   = options.get("clear_cookies", True)
+  deploy_backends = options.get("deploy_backends", False)
 
-  if options.set_default:
-    set_default_serving_version(ver_id)
+
+  appcfg(
+    "update -v ", error=False, capture=True, cwd=opts.proj.dirs.dist)
+
+  # if set_default:
+  #   set_default_serving_version(ver_id)
 
   if options.deploy_backends:
     call_task("backends_deploy")
@@ -172,11 +180,12 @@ def datastore_init():
   """
   cleans + creates the local app engine sdk server blobstore & datastore.
   """
-  rm(opts.proj.dirs.data.datastore,
-     opts.proj.dirs.data.blobstore)
-  opts.proj.dirs.data.blobstore.makedirs()
-  opts.proj.dirs.data.datastore.makedirs()
+  rm(opts.proj.dirs.data.datastore, opts.proj.dirs.data.blobstore)
+
+  opts.proj.dirs.data.blobstore.makedirs_p()
+  opts.proj.dirs.data.datastore.makedirs_p()
   opts.proj.dirs.data.datastore_file.touch()
+
   print("---> datastore_init success\n")
 
 
@@ -185,45 +194,73 @@ dev_appserver_config_option = (
                      "dev_appserver.yaml, to run the server with.")
 
 
+def supervisor_render_config(config_id, env_id, ver_id):
+  """
+  generates the supervisord.conf file
+  """
+  context = dict(
+    dev_appserver_command=_parse_flags(_dev_appserver_config(config_id)),
+    app_id=opts.proj.app_id,
+    env_id=env_id,
+    ver_id=ver_id,
+    stdout=_stdout_path(),
+  )
+  supervisor.render_config(context)
+  # supervisor.reload_config()
+
+
 @task
 @cmdopts([dev_appserver_config_option])
 def server_run(options):
   """
   starts a google app engine server for local development.
   """
+
   env_id = options.get("env_id", opts.proj.envs.local)
   ver_id = release.dist_version_id()
   config_id = options.get("config_id", "default")
 
+  print('version: {}'.format(ver_id))
+  supervisor.stop('devappsever-{}'.format(env_id))
+
   # if supervisor.is_pid_running(pid):
   #   raise ServerStartFailure("app engine sdk server is already running..")
 
-  dev_appserver_command = _parse_flags(_dev_appserver_config(config_id))
-
-  # generate the supervisord.conf file
-  context = dict(
-    dev_appserver_command=dev_appserver_command,
-    app_id=opts.proj.app_id,
+  #@ generates the supervisord.conf file
+  supervisor_render_config(
+    config_id=config_id,
     env_id=env_id,
     ver_id=ver_id,
-    stdout=_stdout_path(),
   )
-  template = (opts.proj.dirs.buildconfig / 'supervisord.template.conf').text()
 
-  jinjaenv = Environment(loader=DictLoader(
-    {'supervisord.template.conf': str(template)}
-  ))
+  out = supervisor.start()
+  if "ERROR: ANOTHER PROGRAM" in out.upper():
+    print("[ supervisord:warning ] supervisor daemon already running..")
 
-  descriptor.render_jinjaenv(jinjaenv, context, opts.proj.dirs.base)
-  supervisor.start()
+  elif "ERROR" in out.upper():
+    raise ServerStartFailure("[ supervisord:error ] failed to start supervisor: {}".format(out))
 
-  stdout = supervisor.run('devappserver-{}'.format(env_id))
+  else:
+    print('[ supervisor ]'.format(out))
 
-  if "ERROR (already started)" in stdout:
-    raise ServerStartFailure("server already running..")
 
-  elif "ERROR" in stdout:
-    raise ServerStartFailure("server already running: {}".format(stdout))
+  out = supervisor.run('devappserver-{}'.format(env_id))
+
+  if "ERROR (ALREADY STARTED)" in out.upper():
+    raise ServerStartFailure("[ supervisord:error ] server already running..")
+
+  elif "ABNORMAL TERMINATION" in out.upper():
+    _sh = 'cat "{}"'.format(opts.proj.dirs.logs / "app.log");
+    _logs = sh(_sh, error=False, capture=True)
+    print(_logs)
+
+    raise ServerStartFailure("[ supervisord:error ] {}".format(out))
+
+  elif "ERROR" in out.upper():
+    raise ServerStartFailure("[ supervisord:error ] {}".format(out))
+
+  else:
+    print(out)
 
 
 @task

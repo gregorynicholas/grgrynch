@@ -2,11 +2,11 @@
   paver.ext.gae.descriptor
   ~~~~~~~~~~~~~~~~~~~~~~~~
 
-  paver extension to work with app engine config yaml descriptors.
+  paver extension to work with app-engine yaml service config descriptors.
 
 
   :copyright: (c) 2014 by gregorynicholas.
-  :license: MIT, see LICENSE for more details.
+
 """
 from __future__ import unicode_literals
 from jinja2 import Environment
@@ -18,12 +18,17 @@ from paver.ext import utils
 from paver.ext.project import opts
 
 
-__all__ = ['build_descriptors', 'render_jinjaenv']
+__all__ = [
+  'DESCRIPTORS',
+  'build_descriptors',
+  'render_jinja_templates',
+  'DescriptorNotFound'
+]
 
 
 class DESCRIPTORS(object):
   """
-  enum of app engine descriptor file names.
+  enum of app-engine service descriptor file-names.
   """
   app = "app"
   backends = "backends"
@@ -65,14 +70,13 @@ for name in [_ for _ in dir(DESCRIPTORS) if not _.startswith("_")]:
 # descriptor utils.
 # -----------------------------------------------------------------------------
 
-def render_jinjaenv(jinjaenv, context, dest):
+def render_jinja_templates(jinjaenv, context, dest):
   """
   renders all templates in the specified `jinjaenv`.
   """
   for name, _ in jinjaenv.loader.mapping.iteritems():
-    _create_descriptor(
-      name.replace(".template", ""),
-      jinjaenv.get_template(name), context, dest)
+    template = jinjaenv.get_template(name)
+    _write_descriptor(name, template, context, dest)
 
 
 def _load_descriptors():
@@ -80,24 +84,25 @@ def _load_descriptors():
   loads yaml descriptor templates and returns an instance of a
   `jinja2.Environment`
   """
-  descriptors = opts.proj.dirs.gae.descriptors.walkfiles("*.yaml")
+  _des = opts.proj.dirs.gae.descriptors.walkfiles("*.yaml")
   rv = Environment(loader=DictLoader(
-    {str(d.name): str(d.text()) for d in descriptors}
+    {str(d.name): str(d.text()) for d in _des}
   ))
   return rv
 
 
-def _create_descriptor(name, template, context, dest):
+def _write_descriptor(name, template, context, dest):
   """
   parses the config template files and generates yaml descriptor files in
   the root directory.
 
     :param template: instance of a jinja2 template object
     :param context: instance of a dict
-    :param dest: instance of a paver.easy.path object
+    :param dest: instance of a paver.easy.path, string file path to write to
   """
-  descriptor = dest / name.replace(".template", "")
-  descriptor.write_text(template.render(**context))
+  print('writing descriptor file: {} ({})'.format(name, dest))
+  _des = dest / name.replace(".template", "")
+  _des.write_text(template.render(**context))
 
 
 def build_descriptors(dest, env_id, ver_id=None):
@@ -119,7 +124,7 @@ def build_descriptors(dest, env_id, ver_id=None):
 
   inbound_services = []
   if env_id in ('prod', 'integration'):
-    # on local machine, warmup seems to be called in a continuous poll..
+    #: on local machine, warmup seems to be called in a continuous poll..
     inbound_services.append('warmup')
 
   context = dict(
@@ -132,7 +137,6 @@ def build_descriptors(dest, env_id, ver_id=None):
     builtins=builtins,
     inbound_services=inbound_services,
     runtime=runtime,
-    api_version=api_version,
-  )
+    api_version=api_version)
 
-  render_jinjaenv(_load_descriptors(), context, dest)
+  render_jinja_templates(_load_descriptors(), context, dest)

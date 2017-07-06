@@ -2,21 +2,25 @@
   paver.ext.gae.backends
   ~~~~~~~~~~~~~~~~~~~~~~
 
-  paver extension to automate app engine.
+  paver extension to work with app-engine backend services.
 
 
   :copyright: (c) 2014 by gregorynicholas.
-  :license: MIT, see LICENSE for more details.
+
 """
 from __future__ import unicode_literals
 from paver.easy import options as opts
 from paver.easy import task, call_task
 from paver.ext.gae import descriptor
 from paver.ext.gae.appcfg import appcfg
+# from paver.ext import utils
 
 
 __all__ = [
-  "backends", "backends_rollback", "backends_deploy", "get_backends"
+  "backends",
+  "get_backends"
+  "backends_deploy",
+  "backends_rollback",
 ]
 
 
@@ -29,7 +33,10 @@ def get_backends():
 
 @task
 def backends():
-  # todo: yaml dump
+  '''
+  prints backends defined in the gae descriptors.
+  '''
+  #: <TODO> yaml dump..?
   print get_backends()
 
 

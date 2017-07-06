@@ -3,20 +3,27 @@
 @import "mixins/clearfix"
 
 
-// app ui vars
-// ----------------------------------------------------------------------------
+//@ responsive-mobile width ..
+//@ ----------------------------------------------------------------------------
+rspnsv-mobile-breakpt = 480px
+rspnsv-dsktop-breakpt = 992px
+
+
+//@ app ui vars ..
+//@ ----------------------------------------------------------------------------
 app-outer-width = 1400px
+// app-inner-width = 1140px  #<<  <TODO> - 1140 is actual inner width..
+app-outer-height = 1400px
 app-inner-width = 1006px
 app-outer-gutters = (app-outer-width - app-inner-width)
 
-// offset the inner container by 30%
+//@ offset the inner container by 30%
 outer-padding-left = round(app-outer-gutters * 0.3)
 outer-padding-right = round(app-outer-gutters * 0.7)
 
-app-outer-height = 1400px
-
 header-outer-height = 230px
-header-inner-height = 134px
+header-inner-height = 134px  //<<  height for:  .header-inner
+//@  ~header-inner-gutter == 48px margin-top..
 header-inner-gutter = round((header-outer-height - header-inner-height) / 2)
 
 
@@ -24,6 +31,9 @@ header-inner-gutter = round((header-outer-height - header-inner-height) / 2)
 // ----------------------------------------------------------------------------
 bgcolor = #000
 
+
+html, body
+  min-height 10000px
 
 body
   font-family Helvetica, Arial, sans-serif
@@ -34,7 +44,7 @@ body
 
 
 
-// screen responsiveness
+//@ screen responsiveness
 
 @media (min-width: 480px)
   .app-outer
@@ -42,7 +52,7 @@ body
 
 
 
-// adjust the header
+//@ adjust the header
 
 @media (min-width: 480px)
   header
@@ -60,14 +70,14 @@ body
   body
     min-width app-outer-width
 
-  // show the bullshit only on bigger screens
+  //@ show the bullshit only on bigger screens
   header
     .its-80-and-bullshit
       display block
 
   .app-outer
-    // subtract the padding
-    // width (app-outer-width - (outer-padding-left + outer-padding-right))
+    //@ subtract the padding
+    //@ width = (app-outer-width - (outer-padding-left + outer-padding-right))
     width app-outer-width
     padding-left outer-padding-left
 
@@ -80,38 +90,44 @@ header
   padding-bottom 52px
 
   .its-80-and-bullshit
-    // width 490px
+    //@ width = ~490px
     height header-inner-height
     background-image url('/img/header-01-weather-report.png')
     background-repeat no-repeat
     background-position right top
-    opacity 0.3
+    opacity 0.18 !important
 
   .gregorynicholas-roles
-    // width 391px
+    //@ width = ~391px
     height header-inner-height
     background-image url('/img/header-02-roles.png')
     background-repeat no-repeat
-    opacity 0.3
-
+    opacity 0.18 !important
+    -webkit-transition opacity 3s ease-in-out
+    -moz-transition opacity 3s ease-in-out
+    -o-transition opacity 3s ease-in-out
+    transition opacity 3s
     &:hover
-      opacity 1
+      opacity 0.8
       -webkit-transition opacity 0.4s ease-in-out
       -moz-transition opacity 0.4s ease-in-out
       -o-transition opacity 0.4s ease-in-out
       transition opacity 0.4s
 
   .logo-wrapper
-    // width 125px
+    //@ width = ~125px
     height header-inner-height
     background-repeat no-repeat
-    background-position center top
+    background-position center center
+    background-size contain
+    margin-top -30px
+    height 234px
 
     &.animated-gif
       background-image url('/img/header-03-logo.gif')
 
-    &.animated-css3
-      background-image url('/img/header-03-logo-ring.png')
+    // &.animated-css3
+    //   background-image url('/img/header-03-logo-ring.png')
 
     .gregorynicholas-logo
       width 125px
@@ -119,6 +135,8 @@ header
       background-image url('/img/header-03-logo.png')
       background-repeat no-repeat
       margin 0 auto
+      transform scale3d(0.5,0.5,0.5)
+      margin-top 30px
 
 
 .header-inner
@@ -162,28 +180,27 @@ act-title-height = 440px
   overflow hidden
 
 
-// intro
+//@ intro
 
 #section-01-a
   width 1006px
   padding-top 245px
 
-
 #section-01-b
   padding-top 45px
 
-
 #section-01-c
   padding-top 45px
-  // add additional margin between act-i-title
+  //@ add additional margin between act-i-title
   padding-bottom 95px * 2
 
 
-// height-fix for act-i-title
+//@ height-fix for act-i-title
 #section-02
   height act-title-height * 1.2
   line-height act-title-height * 1.2
   overflow hidden
+  margin-top act-title-height
 
 
 #section-03
@@ -198,20 +215,23 @@ act-title-height = 440px
     position absolute
 
 
-// fucking down
+//@ fucking down
 #section-04
   padding-bottom 120px
 
 
-// coleman intro
+//@ coleman intro
 #section-05
-  margin-bottom 178px
+  // margin-bottom 178px
+  margin-bottom 300px
 
 
-// 600 sq ft
+//@ 600 sq ft
 #section-06-a
   text-align center
   margin-bottom 48px
+  img
+    margin 0 auto
 
 
 #section-06-b
@@ -220,7 +240,7 @@ act-title-height = 440px
   margin-left 118px
 
 
-// blew it
+//@ blew it
 #section-07
   text-align center
   min-height 466px
@@ -231,43 +251,46 @@ act-title-height = 440px
     height 466px
     margin-left 144px
     position absolute
-    opacity 0
-
-    img
-      opacity 0
-      margin-top 200px
 
 
-// act-ii-title dropt
+//@ act-ii-title dropt
 #section-08
-  margin-bottom 150px
+  margin-bottom 250px
+  div
+    width 1006px
+    height 440px
+    position absolute
+  img
+    margin 0 auto
+    margin-top 200px
 
 
 #section-09
-  margin-bottom 140px
+  margin-bottom 240px
   text-align center
 
 
-// instagram pull quote
+//@ instagram pull quote
 #section-10
   padding-bottom 170px
 
 
 #section-11
   padding-bottom 30px
-  margin-bottom 110px
+  margin-bottom 210px
   text-align center
 
 
 // angelpad acceptable
 #section-12
-  margin-bottom 100px
+  margin-bottom 300px
   text-align center
 
 
 // demo-day
 #section-13
-  margin-bottom 110px
+  // margin-bottom 110px
+  margin-bottom 500px
 
 
 // act-iii-title pict pivot
@@ -291,7 +314,7 @@ act-title-height = 440px
 // domain swoop
 #section-17
   text-align center
-  padding-bottom 125px
+  padding-bottom 600px
 
 
 // act-iv-title unvael
@@ -356,3 +379,74 @@ act-title-height = 440px
   width 960px
   height 3000px
   overflow hidden
+
+
+
+
+.js-scroll-appear,
+.js-scroll-appear div,
+.js-scroll-appear img
+  -webkit-transition all 1.4s ease-in-out
+  -moz-transition all 1.4s ease-in-out
+  -o-transition all 1.4s ease-in-out
+  transition all 1.4s
+
+.js-scroll-appear.header-inner
+.js-scroll-appear.header-inner div
+.js-scroll-appear.header-inner img
+  -webkit-transition all 0.8s ease-out
+  -moz-transition all 0.8s ease-out
+  -o-transition all 0.8s ease-out
+  transition all 0.8s
+
+#section-01-a
+  -webkit-transition all 0.1s ease-in-out
+  -moz-transition all 0.1s ease-in-out
+  -o-transition all 0.1s ease-in-out
+  transition all 0.1s
+
+#section-01-b
+  -webkit-transition all 0.1s ease-in-out
+  -moz-transition all 0.1s ease-in-out
+  -o-transition all 0.1s ease-in-out
+  transition all 0.1s
+
+#section-11 div
+  -webkit-transition all 2s ease-in-out
+  -moz-transition all 2s ease-in-out
+  -o-transition all 2s ease-in-out
+  transition all 2s
+
+#section-20
+  -webkit-transition all 4s ease-in-out
+  -moz-transition all 4s ease-in-out
+  -o-transition all 4s ease-in-out
+  transition all 4s
+  height 34px
+
+  img
+    position absolute
+    margin-left -100px
+
+  &.appear
+    img
+      margin-left 0
+
+
+#section-07
+  img
+    margin-top 200px
+
+  &.appear
+    img
+      margin-top 0
+
+.js-scroll-appear
+  div,
+  img
+    opacity 0
+
+  &.appear
+    div,
+    img
+      opacity 1

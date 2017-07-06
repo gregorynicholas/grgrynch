@@ -1,63 +1,90 @@
-# circleci.com project build configuration.
+#@ circleci.com project build configuration.
+#@ see https://circleci.com/docs/1.0/configuration/
 
 
-#
-# customize the virtual machine
-#
+#@
+#@ customize the virtual machine
+#@
 machine:
   timezone:
-    Europe/London
+    America/Los_Angeles
   node:
-    version: 0.10.26
+    version: 0.10.40
   python:
-    version: 2.7.5
+    version: 2.7.11
   services:
     # - mongodb
+  environment:
+    # PYENV_ROOT: "$HOME/.pyenv"
+    GCLOUD_PROJECT_ID: grgrynch
+    GCLOUD_PROJECT_NO: 466510373200
 
 
-#
-# customize dependencies.
-#
-dependencies:
-  pre:
-    # set logging only to >= warning
-    - npm config set loglevel warn
+## unused stage..
+checkout:
+  override:
   post:
-    - paver bootstrap
-    - paver build
+    - . build/ci/checkout/virtualenv-setup.sh
 
-    # seed the database with test data
-    - paver serve
-    - paver dbseed
-    - paver stop
+
+#@
+#@ customize dependencies
+#@
+dependencies:
+
+  pre:
+    #@ set logging only to >= warning.
+    - npm config set loglevel warn
+    - . build/ci/dependencies/paver-setup.sh
+
+  override:
+    - pyenv exec paver bootstrap_server
+    - pyenv exec paver bootstrap_client
+    # - pyenv exec paver bootstrap
+    # - pyenv exec paver build
+    # - pyenv exec paver build_client
+    # - pyenv exec paver build_server
+
+    # # seed the database with test data
+    # - pyenv exec paver serve
+    # - pyenv exec paver dbseed
+    # - pyenv exec paver stop
 
 
 test:
   override:
-    # execute client functional & unit tests
-    - paver test_client
+    #@ execute client functional & unit tests
+    - pyenv exec paver test_client
 
-    # execute python functional & integration tests
-    - paver test_backend --mode integration
+    #@ execute python functional & integration tests
+    - pyenv exec paver test_server --mode integration
 
-    # execute casperjs end-to-end tests
-    - paver test_headless_browser
+    #@ execute casperjs end-to-end tests
+    - pyenv exec paver test_headless_browser
 
 
 deployment:
 
-  # deploy develop branch to integration environment
+  #@ deploy develop branch to integration environment
   integration:
     branch: develop
     commands:
-      - paver dist   --env_id integration
-      - paver deploy --default
-      - paver dbseed --env_id integration
+      - pyenv exec paver dist_build --env_id develop
+      - pyenv exec paver deploy --default
+      - pyenv exec paver dbseed --env_id develop
 
-  # deploy master branch to qa environment
+  #@ deploy prod branch to qa environment
   qa:
-    branch: master
+    branch: qa
     commands:
-      - paver dist   --env_id qa
-      - paver deploy --default
-      - paver dbseed --env_id qa
+      - pyenv exec paver dist_build --env_id qa
+      - pyenv exec paver deploy --default
+      - pyenv exec paver dbseed --env_id qa
+
+  #@ deploy prod branch to qa environment
+  prod:
+    branch: prod
+    commands:
+      - pyenv exec paver dist_build --env_id prod
+      - pyenv exec paver deploy --default
+      - pyenv exec paver dbseed --env_id prod

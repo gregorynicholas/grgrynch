@@ -2,19 +2,23 @@
   paver.ext.pip
   ~~~~~~~~~~~~~
 
-  paver extension for python pip.
+  paver extension for working with python setuptools + pip.
 
 
   :copyright: (c) 2014 by gregorynicholas.
-  :license: MIT, see LICENSE for more details.
+
 """
 from __future__ import unicode_literals
+from pprint import pformat
 from paver.easy import options as opts
 from paver.ext.utils import sh
-from pkg_resources import Distribution
+from pkg_resources import Distribution  # <TODO> add as alias to utils
 
 
-__all__ = ["get_installed_top_level_files"]
+__all__ = [
+  "install",
+  "get_installed_top_level_files",
+]
 
 
 def install(packages, group='runtime'):
@@ -23,16 +27,17 @@ def install(packages, group='runtime'):
 
     :param packages: dict, list, or string name of package to install.
   """
-
   if isinstance(packages, dict):
     packages = packages[group]
   elif isinstance(packages, str):
     packages = [packages]
 
+  log = 'pip-install.log'
+
   return sh(
-    "pip install --download-cache={cache} -q {packages}",
+    "pip install --disable-pip-version-check --log {log} {packages}",
     packages=" ".join(packages),
-    cache=opts.proj.dirs.base / ".pip",
+    log=log,
     cwd=opts.proj.dirs.base)
 
 
@@ -40,30 +45,76 @@ def _normalize(name):
   """
   normalizes the file name of a package.
   """
-  return name.split("==")[0].split("#egg=")[-1].replace("-", "_").lower()
+  #: <TODO> check for "egg" vs "dist"
+  _sep = '=='
+
+  if '>=' in name:
+    _sep = '>='
+
+  elif '<=' in name:
+    _sep = '<='
+
+  return name.split(_sep)[0].split("#egg=")[-1].replace("-", "_").lower()
 
 
 def get_normalized_package_names(packages):
+  """
+    :param packages:
+    :returns:
+  """
   return [_normalize(_) for _ in packages]
+
+
+def filter_top_level_runtime_deps(toplevels):
+  rv = []
+
+  for top in toplevels:
+    if (top == "tests") or (top.startswith("tests") or top.endswith("tests")):
+      continue
+
+    rv.append(top)
+  return rv
 
 
 def get_installed_top_level_files(packages):
   """
+    :param packages:
+    :returns:
   """
-  venvlib = opts.proj.dirs.venv / "lib/python2.7/site-packages"
+  venvpkgs = opts.proj.dirs.venv / "lib/python2.7/site-packages"
   runtimes = get_normalized_package_names(packages)
-  rv = []
-  for egg in venvlib.walkdirs("*.egg-info"):
-    dist = Distribution.from_location(egg, basename=str(egg.name))
 
-    if _normalize(dist.project_name) not in runtimes:
+  print('''
+  site-packages: {}
+  runtimes: {}
+  '''.format(venvpkgs, pformat(runtimes)))
+
+  rv = []
+  _dirs = [venvpkgs.walkdirs("*.egg-info"), venvpkgs.walkdirs("*.dist-info")]
+  _eggs = []
+
+  for _gen in _dirs:
+    for _dir in _gen:
+      _eggs.append(_dir)
+
+  print('_eggs: {}'.format(pformat(_eggs)))
+
+  for _egg in _eggs:
+    print('_egg: {}'.format(_egg))
+
+    dist = Distribution.from_location(_egg, basename=str(_egg.name))
+    _name = _normalize(dist.project_name)
+
+    print('_name: {}'.format(_name))
+
+    if _name not in runtimes:
       continue
 
-    toplevels = (egg / "top_level.txt").text().split("\n")
+    toplevels = (_egg / "top_level.txt").text().split("\n")
     toplevels.remove("")
 
     for tlevel in [_ for _ in toplevels if _ != "tests"]:
-      _path = venvlib / tlevel
+      _path = venvpkgs / tlevel
 
       if not _path.isdir():
         tlevel += ".py"
@@ -71,6 +122,6 @@ def get_installed_top_level_files(packages):
       else:
         pass
 
-      rv.append(venvlib / tlevel)
+      rv.append(venvpkgs / tlevel)
 
   return rv

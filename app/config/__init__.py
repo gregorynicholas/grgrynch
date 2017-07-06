@@ -6,21 +6,28 @@
 
 
   :copyright: (c) 2014 by gregorynicholas.
-  :license: MIT, see LICENSE for more details.
+
 """
 from __future__ import unicode_literals
-import os
+from os import environ
 import keys
 
 
 __all__ = [
-  "DEFAULT_ENV_ID", "env_id", "config", "LocalConfig", "QaConfig",
-  "TestConfig", "IntegrationConfig", "ProdConfig"
+  "DEFAULT_ENV_ID",
+  "env_id",
+  "config",
+  "Config",
+  "LocalConfig",
+  "QaConfig",
+  "TestConfig",
+  "IntegrationConfig",
+  "ProdConfig",
 ]
 
 
 DEFAULT_ENV_ID = "local"
-env_id = os.environ.get("ENV_ID", DEFAULT_ENV_ID)
+env_id = environ.get("ENV_ID", DEFAULT_ENV_ID)
 
 
 class AppConfig(object):

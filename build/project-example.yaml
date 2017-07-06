@@ -1,0 +1,93 @@
+project:
+
+  email                       : "{email}"
+  password                    : "{password}"
+  default_hostname            : "localhost:8888"
+  virtualenv_id               : "{virtualenv_id}"
+  pip_dependencies            : "dependencies.yaml"
+
+  envs:
+    local: "local"
+    test: "test"
+    integration: "integration"
+    qa: "qa"
+    prod: "prod"
+
+  dev_appserver:
+    ver: google_appengine-1.9.1
+    src: https://googleappengine.googlecode.com/files/
+
+    default:
+      args:
+        host: lvh.me
+        port: 8888
+        admin_host: lvh.me
+        admin_port: 8080
+        max_server_instances: "default:1,backend:0"
+        dev_appserver_log_level: info
+      flags:
+        - allow_skipped_files
+        - automatic_restart
+        - skip_sdk_update_check
+        - enable_task_running
+
+    integration:
+      args:
+        host: {hostname}
+        port: 8888
+      flags:
+        - clear_datastore
+        - require_indexes
+        - skip_sdk_update_check
+        - enable_task_running
+
+  dirs:
+
+    base                      : ./
+    buildconfig               : ./build
+    lib                       : ./lib
+
+    app                       : ./app
+    app_web_static            : ./app/web/static
+    app_web_templates         : ./app/web/templates
+    client                    : ./client
+    client_build              : ./client/build
+    client_build_dist         : ./client/build/dist
+    client_test               : ./client/build/test
+
+    # all script, style, img nested under static root..
+    client_build_static       : ./client/build/dist/static
+
+    # html files as jinja templates..
+    client_build_templates    : ./client/build/dist/templates
+
+    build                     : ./.build
+    dist                      : ./.dist
+    deploy                    : ./.deploy
+    pip                       : ./.pip
+    venvs                     : ~/.virtualenvs
+
+    gae:
+      descriptors             : ./build/descriptors
+      dev_appserver_pid       : ./.dev_appserver.pid
+
+    mongodb:
+      pid                     : ./.mongod.pid
+
+    casperjs:
+      lib                     : ./.casperjs
+      root                    : ./app/tests/casperjs
+      src                     : ./app/tests/casperjs/src
+      dest                    : ./app/tests/casperjs/build
+
+    # seed + local development data..
+    data:
+      root                    : ./.data
+      blobstore               : ./.data/blobstore
+      datastore               : ./.data/datastore
+      datastore_file          : ./.data/datastore/dev_appserver.sqlite
+
+    # ci pylint reports..
+    lint:
+      root                    : ./.lint
+      reports                 : ./.lint/reports

@@ -1,3 +1,4 @@
+# encoding: utf-8
 """
   paver.ext.http
   ~~~~~~~~~~~~~~
@@ -6,13 +7,21 @@
 
 
   :copyright: (c) 2014 by gregorynicholas.
-  :license: MIT, see LICENSE for more details.
+
 """
 import urllib2
 import time
 from paver.ext.utils import sh
 
-__all__ = ["wget", "ping", "PingError", "health_check"]
+
+__all__ = [
+  "curl",
+  "wget",
+
+  "ping",
+  "health_check",
+  "PingError",
+]
 
 
 class PingError(ValueError):
@@ -33,7 +42,7 @@ def ping(url, retries=15, sleep=2):
       urllib2.urlopen(url)
       break
     except urllib2.URLError:
-      print "can't connect to local appengine server.. will retry.."
+      print("can't connect to local appengine server.. will retry..")
     time.sleep(sleep)
   else:
     raise PingError("""
@@ -51,7 +60,7 @@ def health_check(url, retries=15, sleep=2):
   """
   ping(url, retries=retries, sleep=sleep)
 
-  print "connected to {}".format(url)
+  print("connected to {}".format(url))
 
 
 def wget(src, dest, callback=None):
@@ -61,14 +70,19 @@ def wget(src, dest, callback=None):
     :param callback (todo): move the DL to non-blocking, and invoke
       callback function on done.
   """
-  return sh("wget {}", src, err=True, cwd=dest)
+  return sh("wget {}", src, error=True, cwd=dest)
 
 
-def curl(src, dest, callback=None):
+def curl(url, **kwargs):
   """
     :param src: instance of a `paver.easy.path` object.
     :param dest: instance of a `paver.easy.path` object.
     :param callback (todo): move the DL to non-blocking, and invoke
       callback function on done.
   """
-  # todo
+  # <TODO>
+
+  err = kwargs.pop('error', True)
+  cap = kwargs.pop('capture', True)
+  
+  return sh('curl {}'.format(url), error=err, capture=cap, **kwargs)
