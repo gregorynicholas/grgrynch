@@ -1,6 +1,7 @@
 
 # $win = $ window
 $doc = $ document
+$body = $ document.body
 
 
 fps_ms = 1000        #@ frames per second, for a nice, smooth buttox
@@ -173,9 +174,6 @@ window.requestAnimFrame = (->
 
 $(".js-scroll-appear").appear()
 @has_appeared = {}
-
-
-$body = $(document.body)
 
 $body.on 'appear', '.js-scroll-appear', (e, $affected) ->
   $el = $(@)

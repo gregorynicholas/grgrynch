@@ -20,6 +20,7 @@ from paver.ext.gae import descriptor
 __all__ = [
   "render_config",
   "reload_config",
+  "status",
   "start",
   "shutdown",
   "run",
@@ -40,6 +41,14 @@ class ProcessNotFound(ValueError):
 class ProcessNotRunning(ValueError):
   """
   """
+
+
+def status():
+  """
+  starts supervisord.
+  """
+  res = sh("supervisorctl status", capture=True)
+  return res
 
 
 def start():

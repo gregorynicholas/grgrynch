@@ -26,7 +26,13 @@ from flask.ext import login, login_auth
 from flask.ext import login_ndb as login_model
 from flask.ext.kvsession import KVSessionExtension
 
-__all__ = ["Auth", "login_manager", "FlaskUser"]
+
+__all__ = [
+  "Auth",
+  "login_manager",
+  "FlaskUser",
+]
+
 
 log = getLogger(__name__)
 login_manager = login.LoginManager()

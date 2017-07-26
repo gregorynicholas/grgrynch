@@ -59,7 +59,14 @@ pyenv exec pip install --disable-pip-version-check --verbose -r ./build/requirem
     @see https://github.com/GoogleCloudPlatform/continuous-deployment-circle/blob/master/circle.yml
 
 
-#### bootstrap project:
+
+-----
+<br>
+<br>
+
+
+
+#### BOOTSTRAP PROJECT:
 
 ```sh
 #pyenv exec paver bootstrap;
@@ -68,53 +75,73 @@ pyenv rehash;
 pyenv exec paver bootstrap_server_gae_sdk;
 pyenv rehash;
 pyenv exec paver install_sdk;  #< gae.sdk.install_sdk
-pyenv exec paver bootstrap_client;
-pyenv exec paver gae:datastore_init;
+pyenv rehash;
+
+alias paver='pyenv exec paver ';
+paver bootstrap_client;
+paver gae:datastore_init;
 ```
 
 
-#### build, run commands:
+#### BUILD, RUN COMMANDS:
 
 ```sh
 pyenv activate GRGRYNCH-2.7.11;
-pyenv exec paver build;
-pyenv exec paver build_client;
-pyenv exec paver gae:server_run;
-pyenv exec paver gae:server_tail;
-pyenv exec paver gae:server_stop;
+paver build;
+paver build_server;
+paver build_client;
+paver gae:server_run;
+paver gae:server_tail;
+paver gae:server_stop;
+
+```
+
+one-liner:
+
+```sh
+bin/build-run; bin/tail;
 ```
 
 
-#### dist, release, deploy commands:
+#### SUPERVISOR CTL COMMANDS:
 
 ```sh
 _kill() {
   ps aux |  grep "$1" |  grep -v "grep" |  awk '{print $2}' |  xargs kill -9;
 };
 
-pyenv exec paver build;
-pyenv exec paver gae:server_stop;
+paver build;
+paver gae:server_stop;
 
 _kill  "dev_appserver.py";
 _kill  "_python_runtime.py";
 
-pyenv exec paver gae:server_run;
+paver gae:server_run;
 supervisorctl start devappserver-local;
+supervisorctl restart devappserver-local;
+supervisorctl stop devappserver-local;
 ```
 
 
+
+#### RELEASE, DEPLOY COMMANDS:
+
 ```sh
+
 #@ RELEASE + DEPLOY
-#@@
-pyenv exec paver dist_build --env_id qa;
-pyenv exec paver dist_build --env_id prod;
-
-
+#@
+paver dist_build --env_id qa;
+paver dist_build --env_id prod;
 cd .dist/;
 appcfg.py update --no_usage_reporting --skip_sdk_update_check --verbose .;
 cd -;
-#-or-
+```
+
+-or-
+
+```sh
 pyenv exec paver gae:deploy;
+
 ```
 
 

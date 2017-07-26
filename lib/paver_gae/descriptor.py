@@ -20,9 +20,9 @@ from paver.ext.project import opts
 
 __all__ = [
   'DESCRIPTORS',
+  'DescriptorNotFound',
   'build_descriptors',
   'render_jinja_templates',
-  'DescriptorNotFound'
 ]
 
 
@@ -30,12 +30,12 @@ class DESCRIPTORS(object):
   """
   enum of app-engine service descriptor file-names.
   """
-  app = "app"
+  app      = "app"
   backends = "backends"
-  cron = "cron"
-  dos = "dos"
-  index = "index"
-  queue = "queue"
+  cron     = "cron"
+  dos      = "dos"
+  index    = "index"
+  queue    = "queue"
 
 
 class DescriptorNotFound(BuildFailure):
@@ -118,14 +118,29 @@ def build_descriptors(dest, env_id, ver_id=None):
   runtime = 'python27'
   api_version = 1
 
-  builtins = [
+
+  _builtins = [
     'deferred',
   ]
 
-  inbound_services = []
+
+  _inbound_services = []
   if env_id in ('prod', 'integration'):
-    #: on local machine, warmup seems to be called in a continuous poll..
-    inbound_services.append('warmup')
+    #@ on local machine, warmup seems to be called in a continuous poll..
+    _inbound_services.append('warmup')
+
+
+  _libraries = [
+    {
+      'name': 'jinja2',
+      'version': '2.6',
+    },
+    {
+      'name': 'lxml',
+      'version': '2.3',
+    },
+  ]
+
 
   context = dict(
     app_id=opts.proj.app_id,
@@ -134,8 +149,9 @@ def build_descriptors(dest, env_id, ver_id=None):
     module_id=module_id,
     templates_dir=str(opts.proj.dirs.app_web_templates.relpath()),
     static_dir=str(opts.proj.dirs.app_web_static.relpath()),
-    builtins=builtins,
-    inbound_services=inbound_services,
+    builtins=_builtins,
+    inbound_services=_inbound_services,
+    libraries=_libraries,
     runtime=runtime,
     api_version=api_version)
 

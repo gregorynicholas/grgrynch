@@ -1,0 +1,27 @@
+
+
+handlers:
+
+- url: /_ah/pipeline.*
+  script: mapreduce.lib.pipeline.handlers._APP
+- url: /mapreduce/pipeline/images
+  static_dir: lib/mapreduce/lib/pipeline/ui/images
+
+- url: /_ah/mapreduce.*
+  script: mapreduce.main.APP
+- url: /mapreduce(/.*)?
+  script: mapreduce.main.APP
+
+
+
+admin_console:
+  pages:
+  - name: mapreduce
+    url: /_ah/mapreduce/
+
+  - name: pipelines
+    url: /_ah/pipeline/status
+
+
+builtins:
+- admin_redirect: off

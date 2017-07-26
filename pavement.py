@@ -166,17 +166,17 @@ def bootstrap_client():
     print("---> nvm install success\n")
 
   _nvm_sh  = ''
-  _nvm_sh += ' export NVM_DIR="$HOME/.nvm" && . "$NVM_DIR/nvm.sh" >logs/build-client.log 2>&1 && '
-  out = sh('{} nvm install 0.10.40 >logs/build-client.log 2>&1'.format(_nvm_sh), shell=False)
+  _nvm_sh += ' export NVM_DIR="$HOME/.nvm" && . "$NVM_DIR/nvm.sh" >.logs/build-client.log 2>&1 && '
+  out = sh('{} nvm install 0.10.40 >.logs/build-client.log 2>&1'.format(_nvm_sh), shell=False)
 
-  _nvm_sh += ' nvm use {} >logs/build-client.log 2>&1 '.format('0.10.40')
+  _nvm_sh += ' nvm use {} >.logs/build-client.log 2>&1 '.format('0.10.40')
   out = sh('{}'.format(_nvm_sh), shell=False)
 
   rm(opts.proj.dirs.client / "node_modules")
 
   # "express": "~3.1.0"
   _deps = 'grunt@0.4.1 grunt-cli@0.1.8 bower@1.8.0 stylus@0.31.0 coffee-script'
-  out = sh("{} && npm install -g {} >logs/build-client.log 2>&1", _nvm_sh, _deps, shell=False)
+  out = sh("{} && npm install -g {} >.logs/build-client.log 2>&1", _nvm_sh, _deps, shell=False)
   out = sh("npm install", cwd=opts.proj.dirs.client, shell=False)
   out = sh("bower install", cwd=opts.proj.dirs.client, shell=False)
 
@@ -386,33 +386,41 @@ def dist_build(options):
 
   #@ STEP 2
   #@ ------
+
+  #@ <TODO> merge this list with app.yaml.skip_files..
+
   do_not_deploy = (
-    "*.py[co]",
+    ".DS_Store",
+    ".coverage",
+    ".circle.yml",
     ".data",
+    ".dist",
+    ".download",
+    ".git",
     ".lint",
+    ".logs",
+    ".wiki",
+
     "build",
     "client",
-    "tests",
     "docs",
-    ".git*",
-    ".download",
-    ".wiki",
+
     "*.pid",
     "*.pip",
-    "*.out",
+    "*.py[co]",
     "*.err",
+    "*.out",
     "*.md",
     "*.sh",
     "*.txt",
-    ".coverage",
+
     "*.*env",
-    ".DS_Store",
-    "pavement.py",
     "paver_*",
+    "pavement.py",
+    "tests",
     "testsuite",
     "*_tests.py",
     "*supervisor*",
-    "logs",
 
     #@ wtforms
     "sqlalchemy",

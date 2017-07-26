@@ -1,5 +1,5 @@
 #@ build, release dirs
-bin/
+#bin/
 bin-debug/
 bin-release/
 .settings/
@@ -16,7 +16,6 @@ bin-release/
 dist
 eggs
 parts
-bin
 var
 sdist
 develop-eggs
@@ -105,7 +104,7 @@ lib/blinker
 
 
 #@ node build output
-npm-debug.log
+npm-*.log
 node_modules
 
 
@@ -115,14 +114,5 @@ keys.py
 build/project.yaml
 
 supervisord.conf
-supervisord.log
 
 *google-api-python-client*
-
-/logs/*
-client/build/
-
-
-#@ project wiki
-.WIKI
-.download

@@ -22,6 +22,16 @@ from app.web import jinjaenv
 from app.models import user
 
 
+__all__ = [
+  'index_get',
+  'favicon',
+  'login_get',
+  'logout_get',
+  'admin_get',
+  'test_signin_get',
+]
+
+
 debug = False
 log = getLogger(__name__)
 if debug:

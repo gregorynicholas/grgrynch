@@ -1,0 +1,7 @@
+
+
+handlers:
+
+- url: /_ereporter.*
+  script: google.appengine.ext.ereporter.report_generator.application
+

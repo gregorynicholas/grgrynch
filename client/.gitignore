@@ -1,0 +1,11 @@
+
+#@ client build output
+#@ ~~~~~~~~~~~~~~~~~~~
+#@
+
+/client/build/*
+
+
+#@ node build output
+npm-*.log
+node_modules

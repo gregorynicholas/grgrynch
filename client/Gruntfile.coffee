@@ -131,8 +131,9 @@ module.exports = (grunt) ->
       vendor_scripts:
         src: [
           "#{VENDOR_DIR}/**/modernizr/*.js",
-          "#{VENDOR_DIR}/**/bootstrap/*.js",
           "#{VENDOR_DIR}/**/jquery/*.js",
+          "#{VENDOR_DIR}/**/bootstrap/*.js",
+          "#{VENDOR_DIR}/**/typo-nodes/*.js",
           # "#{VENDOR_DIR}/**/angular/angular.min.js",
           # "#{VENDOR_DIR}/**/angular-resource/angular-resource.min.js",
         ]

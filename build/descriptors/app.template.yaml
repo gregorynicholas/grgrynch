@@ -1,4 +1,4 @@
-# application: {{app_id}}-{{env_id}}
+#@ application: {{app_id}}-{{env_id}}
 application: {{app_id}}
 version: "{{ver_id}}"
 runtime: {{runtime}}
@@ -20,31 +20,13 @@ env_variables:
 handlers:
 
 
-# appengine built-ins
-
-- url: /_ereporter.*
-  script: google.appengine.ext.ereporter.report_generator.application
+#@ appengine built-in warm-up requests
 
 - url: /_ah/warmup
   script: app.main.flaskapp
 
-# - url: /_ah/appstats.*
-#   script: google.appengine.ext.appstats.ui.app
 
-# - url: /_ah/mapreduce.*
-#   script: mapreduce.main.APP
-
-# - url: /_ah/pipeline.*
-#   script: mapreduce.lib.pipeline.handlers._APP
-
-# - url: /mapreduce/pipeline/images
-#   static_dir: lib/mapreduce/lib/pipeline/ui/images
-
-# - url: /mapreduce(/.*)?
-#   script: mapreduce.main.APP
-
-
-# application routes
+#@ application routes
 
 - url: /img/
   static_dir: app/web/static/img/
@@ -60,15 +42,18 @@ handlers:
 
 
 libraries:
-- name: jinja2
-  version: "2.6"
+{% for library in libraries %}
+- name: "{{library.name}}"
+  version: "{{library.version}}"
+{% endfor %}
 
-- name: lxml
-  version: "2.3"
 
-
-# includes:
-# - build/includes.yaml
+includes:
+- build/appengine-builtins-descriptors/appstats/appstats.yaml
+- build/appengine-builtins-descriptors/deferred/deferred.yaml
+- build/appengine-builtins-descriptors/ereporter/ereporter.yaml
+#- build/appengine-builtins-descriptors/mapreduce/mapreduce.yaml
+- build/appengine-builtins-descriptors/remoteapi/remoteapi.yaml
 
 
 inbound_services:
@@ -83,7 +68,7 @@ builtins:
 {% endfor %}
 
 
-# force precompilation on deploy.
+#@ forces precompilation on deploy.
 derived_file_type:
 - python_precompiled
 

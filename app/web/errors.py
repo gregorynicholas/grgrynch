@@ -11,7 +11,7 @@
 """
 from __future__ import unicode_literals
 
-# import error helpers
+#@ import error helpers
 import traceback
 from pprint import pformat
 
@@ -20,7 +20,7 @@ from flask import Response, request
 from flask.ext import templated
 from app.main import flaskapp
 
-# import error handlers
+#@ import error handlers
 from jinja2 import TemplateNotFound
 from google.appengine.api import datastore_errors
 
@@ -43,7 +43,7 @@ def page_not_found(error=None):
       request.endpoint,
       request.url_rule,
       pformat(request.data))
-  return templated.render_session_template(flaskapp, "404.html"), 404
+  return templated.render(flaskapp, "404.html"), 404
 
 
 @flaskapp.errorhandler(500)
@@ -56,7 +56,7 @@ def server_error_500(server_error):
   if request.is_xhr:
     return Response(status=500)
   else:
-    return templated.render_session_template(flaskapp, "500.html"), 500
+    return templated.render(flaskapp, "500.html"), 500
 
 
 @flaskapp.errorhandler(TemplateNotFound)
@@ -105,3 +105,4 @@ def datastore_bad_argument_error(error=None):
   """
   """
   return Response(status=500)
+

@@ -204,6 +204,13 @@ def supervisor_render_config(config_id, env_id, ver_id):
     env_id=env_id,
     ver_id=ver_id,
     stdout=_stdout_path(),
+    supervisorctl_history_file=opts.proj.dirs.logs / '.supervisorctl-history',
+    supervisorctl_socker_serverurl='unix:///tmp/supervisor.sock',
+    unix_http_server='/tmp/supervisor.sock',
+    inet_http_server='127.0.0.1:9001',
+    # inet_http_server='*:9001',
+    supervisord_logfile=opts.proj.dirs.logs / '.supervisor.log',
+    supervisord_pidfile=opts.proj.dirs.logs / '.supervisor.pid',
   )
   supervisor.render_config(context)
   # supervisor.reload_config()
@@ -261,6 +268,9 @@ def server_run(options):
 
   else:
     print(out)
+
+  out = supervisor.status()
+  print(out)
 
 
 @task

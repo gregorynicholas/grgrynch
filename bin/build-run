@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+
+supervisorctl stop devappserver-local;
+paver build;
+supervisorctl start devappserver-local;
+supervisorctl status devappserver-local;
+tail -f .logs/*.log;

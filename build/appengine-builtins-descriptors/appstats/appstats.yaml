@@ -1,0 +1,17 @@
+
+
+handlers:
+
+- url: /_ah/appstats.*
+  script: google.appengine.ext.appstats.ui.app
+
+
+admin_console:
+  pages:
+  - name: appstats
+    url: /_ah/appstats
+
+
+builtins:
+- appstats: on
+

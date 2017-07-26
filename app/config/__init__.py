@@ -178,18 +178,18 @@ class ProdConfig(Config):
   sentry_dsn = None
 
 
-_env_config = None
+_environ_config = None
 
 
 def _config():
   """
     :returns: reference to a Config class based on the current environment.
   """
-  global _env_config
-  if _env_config is not None:
-    return _env_config
-  _env_config = globals().get("{}Config".format(env_id.capitalize()))
-  setattr(_env_config, "env_id", env_id)
-  return _env_config
+  global _environ_config
+  if _environ_config is not None:
+    return _environ_config
+  _environ_config = globals().get("{}Config".format(env_id.capitalize()))
+  setattr(_environ_config, "env_id", env_id)
+  return _environ_config
 
 config = _config()
