@@ -1,6 +1,15 @@
+
 @import "vendor.css"
 @import "mixins/stretch"
 @import "mixins/clearfix"
+
+@import "fonts/helveticaneue-light"
+@import "fonts/helveticaneue-regular"
+@import "fonts/helveticaneue-medium"
+@import "fonts/helveticaneue-bold"
+
+//@import "fonts/itc-charter-roman"
+//@import "fonts/itc-charter-bold"
 
 
 //@ responsive-mobile width ..
@@ -44,7 +53,8 @@ html, body
 body
   background-image url('/img/bg/_H3A0494_gregory_nicholas_@1x.jpg')
   background-repeat no-repeat
-  background-size contain
+  background-size cover
+  background-attachment fixed
   background-position 0px 0px
 
 
@@ -73,6 +83,8 @@ body
 
 @media (min-width: 992px)
   body
+    position absolute
+    width 100vw
     min-width app-outer-width
 
   //@ show the bullshit only on bigger screens
