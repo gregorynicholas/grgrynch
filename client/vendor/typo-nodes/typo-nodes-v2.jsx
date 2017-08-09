@@ -437,7 +437,6 @@ var Typo = {};
    * returns distance between two points.
    */
   Typo.distanceTo = function(pointA, pointB, angle){
-
     var dx = Math.abs(pointA.x - pointB.x);
     var dy = Math.abs(pointA.y - pointB.y);
 

@@ -19,14 +19,19 @@
 // see https://codepen.io/gregorynicholas/pen/XaWdgp
 
 
-var Typo = {};
+var $Typo = {};
+var W = window;
+var D = document;
+var $W = $(W);
+var $D = $(D);
 
 
-(function(Typo) {
+(function($Typo) {
 
-  var Typo = window.Typo || {};
-  var canvas, context;
-  var mouse = { x: -99999, y: -99999 };
+  var $Typo = W.$Typo || {};
+  var canvas;
+  var context;
+  var mouse = {x:-99999, y:-99999};
   var nodes = [];
   var dirtyRegions = [];
   var inputForce = force = 0;
@@ -34,13 +39,12 @@ var Typo = {};
   var FPS = 60;
   var text = 'gregory' + 'nicholas';
   var interactive = true;
+  var _node_friction = 0.7;
 
 
 
   /*
-   * Settings.
-   */
-  /*
+  // dat-gui settings.
   var Settings = function() {
     this.text = 'gregorynicholas';
     this.interactive = true;
@@ -55,29 +59,61 @@ var Typo = {};
     };
   };
   */
-
-
-
   /*
-    * Init.
+  // dat-gui main
+  // https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.5/dat.gui.min.js
+  var GUI = new dat.GUI();
+  var settings = new Settings();
+  GUI.add(settings, 'text').onChange(settings.changeText);
+  GUI.add(settings, 'interactive').onChange(settings.enableInteractivity);
+  */
+
+
+
+
+  /**
+   * initializer.
    */
-  Typo.init = function() {
+  $Typo.init = function() {
+    this._init_canvas_dom();
 
-    /*
-    // Dat GUI main
-    // https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.5/dat.gui.min.js
-    var GUI = new dat.GUI();
-    var settings = new Settings();
-    GUI.add(settings, 'text').onChange(settings.changeText);
-    GUI.add(settings, 'interactive').onChange(settings.enableInteractivity);
-    */
+    // browser supports canvas?
+    if (!$Typo._supported()) {
+      return console.error("browser doesn't support canvas.");
+    }
 
-    var body = document.querySelector('body');
-    canvas = document.createElement('canvas');
+    context = canvas.getContext('2d');
+
+    // events
+    if ('ontouchstart' in W) {
+      canvas.addEventListener('touchstart', $Typo.onTouchStart, false);
+      canvas.addEventListener('touchend', $Typo.onTouchEnd, false);
+      canvas.addEventListener('touchmove', $Typo.onTouchMove, false);
+    }
+
+    else {
+      canvas.addEventListener('mousedown', $Typo.onMouseDown, false);
+      canvas.addEventListener('mouseup', $Typo.onMouseUp, false);
+      canvas.addEventListener('mousemove', $Typo.onMouseMove, false);
+
+    }
+
+    $W.on('resize', function(){
+      $Typo._onresize();
+    });
+
+    $Typo._build_texture();
+
+  };
+
+
+  $Typo._init_canvas_dom = function() {
+    var $body = D.querySelector('body');
+    canvas = D.createElement('canvas');
 
     canvas.id = 'gregorynicholas';
-    canvas.width  = window.innerWidth;
-    canvas.height = window.innerHeight * 0.75;
+    canvas.width  = W.innerWidth;
+    canvas.height = W.innerHeight * 0.75;
 
     canvas.style.position = 'absolute';
     canvas.style.top = 0;
@@ -92,153 +128,95 @@ var Typo = {};
     // canvas.style.background = '-o-radial-gradient(#2bb0cc, #0079a5)';
     // canvas.style.background = 'radial-gradient(#2bb0cc, #0079a5)';
 
-    body.appendChild(canvas);
-
-    // Browser supports canvas?
-    if(!!(Typo.gotSupport())) {
-
-      context = canvas.getContext('2d');
-
-      // Events
-      if('ontouchstart' in window) {
-        canvas.addEventListener('touchstart', Typo.onTouchStart, false);
-        canvas.addEventListener('touchend', Typo.onTouchEnd, false);
-        canvas.addEventListener('touchmove', Typo.onTouchMove, false);
-      }
-
-      else {
-        canvas.addEventListener('mousedown', Typo.onMouseDown, false);
-        canvas.addEventListener('mouseup', Typo.onMouseUp, false);
-        canvas.addEventListener('mousemove', Typo.onMouseMove, false);
-
-      }
-
-      $(window).on('resize', function(){
-        Typo.onResize();
-      });
-
-      Typo.buildTexture();
-
-    }
-
-    else {
-
-      console.error("Sorry, your browser doesn't support canvas.");
-
-    }
-
+    $body.appendChild(canvas);
   };
 
 
-  /*
-   * On resize window event.
+  /**
+   * window resize event.
    */
-  Typo.onResize = function(){
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight * 0.75;
+  $Typo._onresize = function(){
+    canvas.width = W.innerWidth;
+    canvas.height = W.innerHeight * 0.75;
     nodes = [], dirtyRegions = [];
   };
 
 
-  /*
-   * Check if browser supports canvas element.
+  /**
+   * checks if browser supports canvas element.
    */
-  Typo.gotSupport = function() {
-
+  $Typo._supported = function() {
     return canvas.getContext && canvas.getContext('2d');
-
   };
 
-  /*
-   * Mouse down event.
+
+  /**
+   * mouse-down event.
    */
-
-  Typo.onMouseDown = function(event) {
-
+  $Typo.onMouseDown = function(event) {
     event.preventDefault();
-
     forceFactor = true;
-
   };
 
-  /*
-   * Mouse up event.
+
+  /**
+   * mouse-up event.
    */
-
-  Typo.onMouseUp = function(event) {
-
+  $Typo.onMouseUp = function(event) {
     event.preventDefault();
-
     forceFactor = false;
-
   };
 
 
 
-  /*
-   * Mouse move event.
+  /**
+   * mouse-move event.
    */
-
-  Typo.onMouseMove = function(event) {
-
+  $Typo.onMouseMove = function(event) {
     event.preventDefault();
 
     mouse.x = event.pageX - canvas.offsetLeft;
     mouse.y = event.pageY - canvas.offsetTop;
-
   };
 
 
 
-  /*
-   * Touch start event.
+  /**
+   * touch-start event.
    */
-
-  Typo.onTouchStart = function(event) {
-
+  $Typo.onTouchStart = function(event) {
     event.preventDefault();
-
     forceFactor = true;
-
   };
 
 
 
-  /*
-   * Touch end event.
+  /**
+   * touch-end event.
    */
-
-  Typo.onTouchEnd = function(event) {
-
+  $Typo.onTouchEnd = function(event) {
     event.preventDefault();
-
     forceFactor = false;
-
   };
 
 
 
-  /*
-   * Touch move event.
+  /**
+   * touch-move event.
    */
-
-  Typo.onTouchMove = function(event) {
-
+  $Typo.onTouchMove = function(event) {
     event.preventDefault();
 
     mouse.x = event.touches[0].pageX - canvas.offsetLeft;
     mouse.y = event.touches[0].pageY - canvas.offsetTop;
-
   };
 
 
 
-  /*
-   * Building texture.
+  /**
+   * builds texture.
    */
-
-  Typo.buildTexture = function() {
-
+  $Typo._build_texture = function() {
     context.clearRect(0, 0, canvas.width, canvas.height);
 
     // Let's start by drawing the original texture
@@ -297,28 +275,24 @@ var Typo = {};
             });
 
           }
-
         }
-
       }
-
     }
 
 
-    // Logic
-    Typo.clear();
-    Typo.update();
-    Typo.render();
-    requestAnimFrame(Typo.buildTexture);
+    // kick-off
+    $Typo._clear();
+    $Typo._update();
+    $Typo._render();
+    requestAnimFrame($Typo._build_texture);
   };
 
 
 
-  /*
-   * Clear only dirty regions.
+  /**
+   * clears only dirty regions.
    */
-
-  Typo.clear = function() {
+  $Typo._clear = function() {
 
     [].forEach.call(dirtyRegions, function(dirty, index) {
       var x, y, width, height;
@@ -334,11 +308,10 @@ var Typo = {};
 
 
 
-  /*
-   * Let's update the nodes.
+  /**
+   * updates the nodes.
    */
-  Typo.update = function() {
-
+  $Typo._update = function() {
     var _force = 0.0001;
     var _distance = 25;
 
@@ -349,62 +322,64 @@ var Typo = {};
         force += _force;
       }
 
-      var angle = Math.atan2(node.y - mouse.y, node.x - mouse.x);
+      var _angle = Math.atan2(node.y - mouse.y, node.x - mouse.x);
 
-      // Ease
-      node.vx += Math.cos(angle) * Typo.distanceTo(mouse, node, true) + (node.goalX - node.x) * 0.1;
-      node.vy += Math.sin(angle) * Typo.distanceTo(mouse, node, true) + (node.goalY - node.y) * 0.1;
+      // node-easing
+      node.vx += Math.cos(_angle) * $Typo._distance_to(
+        mouse, node, true) + (node.goalX - node.x) * 0.1;
+      node.vy += Math.sin(_angle) * $Typo._distance_to(
+        mouse, node, true) + (node.goalY - node.y) * 0.1;
 
-      // Friction
-      node.vx *= 0.7;
-      node.vy *= 0.7;
+      // node-friction
+      node.vx *= _node_friction;
+      node.vy *= _node_friction;
 
       node.x += node.vx;
       node.y += node.vy;
 
 
-      if(!!forceFactor)
+      if (!!forceFactor) {
         inputForce = Math.min(inputForce + 1, 5000);
-      else
+      }
+      else {
         inputForce = Math.max(inputForce - 1, 1000);
         // inputForce = Math.min(inputForce - 1, 500);
+      }
 
 
       // check a neighborhood node
       for(var nextMolecule = index + 1; nextMolecule < nodes.length; nextMolecule++) {
 
-        var otherMolecule = nodes[nextMolecule];
+        var _other_molecule = nodes[nextMolecule];
 
-        // oh we've found one!
-        if (Typo.distanceTo(node, otherMolecule) < _distance) {
+        // oh we've found one ..
+        if ($Typo._distance_to(node, _other_molecule) < _distance) {
           context.save();
           context.beginPath();
           context.globalCompositeOperation = 'destination-over';
-          context.globalAlpha = 1 - Typo.distanceTo(node, otherMolecule) / 100;
+          context.globalAlpha = 1 - $Typo._distance_to(node, _other_molecule) / 100;
           context.lineWidth = 1;
-          // context.strokeStyle = 'rgba(0,0,0, 0.8)';
           context.strokeStyle = 'rgba(255,255,255, 0.9)';
           context.moveTo(node.x, node.y);
-          context.lineTo(otherMolecule.x, otherMolecule.y);
+          context.lineTo(_other_molecule.x, _other_molecule.y);
           context.stroke();
           context.closePath();
           context.restore();
 
         }
-
       }
 
     });
-
   };
 
 
 
 
   /*
-   * Let's render the nodes.
+   * renders the nodes.
    */
-  Typo.render = function() {
+  $Typo._render = function() {
+
     [].forEach.call(nodes, function(node, index) {
       context.save();
       context.fillStyle = 'rgba(255,255,255, 0.4)';
@@ -414,7 +389,7 @@ var Typo = {};
       context.fill();
       context.restore();
 
-      // Dirty regions
+      // dirty regions
       dirtyRegions[index].x = node.x;
       dirtyRegions[index].y = node.y;
       dirtyRegions[index].radius = node.radius;
@@ -424,47 +399,47 @@ var Typo = {};
 
 
 
-  /*
-   * Distance between two points.
+  /**
+   * distance between two points.
    */
-
-  Typo.distanceTo = function(pointA, pointB, angle) {
-
+  $Typo._distance_to = function(pointA, pointB, angle) {
     var dx = Math.abs(pointA.x - pointB.x);
     var dy = Math.abs(pointA.y - pointB.y);
 
-    if (angle)
+    if (angle) {
       return (1000 + (interactive ? inputForce : 0)) / Math.sqrt(dx * dx + dy * dy);
-
-    else
+    }
+    else {
       return Math.sqrt(dx * dx + dy * dy);
+    }
   };
 
 
 
-  /*
-   * Request new frame by Paul Irish.
+  /**
+   * request new frame (by Paul Irish)
    * 60 FPS.
    */
-  window.requestAnimFrame = (function() {
-    return  window.requestAnimationFrame   ||
-        window.webkitRequestAnimationFrame ||
-        window.mozRequestAnimationFrame    ||
-        window.oRequestAnimationFrame      ||
-        window.msRequestAnimationFrame     ||
-        function(callback) {
-          window.setTimeout(callback, 1000 / FPS);
-        };
-      })();
+  W.requestAnimFrame = (function() {
+    return (
+      W.requestAnimationFrame   ||
+      W.webkitRequestAnimationFrame ||
+      W.mozRequestAnimationFrame    ||
+      W.oRequestAnimationFrame      ||
+      W.msRequestAnimationFrame     ||
+      function(callback) {
+        W.setTimeout(callback, 1000 / FPS);
+      }
+    );
+  })();
+
+
 
   // window.addEventListener ? window.addEventListener('load', Typo.init, false) : window.onload = Typo.init;
 
-  $(document).ready(function(){
-    Typo.init();
+  $D.ready(function(){
+    $Typo.init();
   });
 
-})(Typo);
 
-
-console.info('Typo:', Typo);
-
+})($Typo);
