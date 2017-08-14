@@ -204,7 +204,7 @@ def supervisor_render_config(config_id, env_id, ver_id):
     env_id=env_id,
     ver_id=ver_id,
     stdout=_stdout_path(),
-    supervisorctl_history_file=opts.proj.dirs.logs / '.supervisorctl-history',
+    supervisorctl_history_file=opts.proj.dirs.logs / '.supervisorctl-history.log',
     supervisorctl_socker_serverurl='unix:///tmp/supervisor.sock',
     unix_http_server='/tmp/supervisor.sock',
     inet_http_server='127.0.0.1:9001',

@@ -43,7 +43,7 @@ def page_not_found(error=None):
       request.endpoint,
       request.url_rule,
       pformat(request.data))
-  return templated.render(flaskapp, "404.html"), 404
+  return templated.render("404.html")
 
 
 @flaskapp.errorhandler(500)
@@ -56,7 +56,7 @@ def server_error_500(server_error):
   if request.is_xhr:
     return Response(status=500)
   else:
-    return templated.render(flaskapp, "500.html"), 500
+    return templated.render("500.html")
 
 
 @flaskapp.errorhandler(TemplateNotFound)

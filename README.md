@@ -56,7 +56,7 @@ pyenv exec pip install --disable-pip-version-check --verbose -r ./build/requirem
 
 
 <TODO>
-    @see https://github.com/GoogleCloudPlatform/continuous-deployment-circle/blob/master/circle.yml
+  @see https://github.com/GoogleCloudPlatform/continuous-deployment-circle/blob/master/circle.yml
 
 
 
@@ -96,7 +96,7 @@ paver gae:server_stop;
 
 ```
 
-one-liner:
+>one-liner:
 
 ```sh
 bin/build-run; bin/tail;
@@ -137,11 +137,16 @@ appcfg.py update --no_usage_reporting --skip_sdk_update_check --verbose .;
 cd -;
 ```
 
--or-
+>-or-
+
+```sh
+bin/dist
+```
+
+>-or-
 
 ```sh
 pyenv exec paver gae:deploy;
-
 ```
 
 

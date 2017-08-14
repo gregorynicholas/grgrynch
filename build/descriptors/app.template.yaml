@@ -10,7 +10,6 @@ default_expiration: "1h"
 module: {{module_id}}
 {% endif %}
 
-
 env_variables:
   APP_ID: "{{app_id}}"
   ENV_ID: "{{env_id}}"
@@ -19,12 +18,10 @@ env_variables:
 
 handlers:
 
-
 #@ appengine built-in warm-up requests
 
 - url: /_ah/warmup
   script: app.main.flaskapp
-
 
 #@ application routes
 
@@ -49,11 +46,11 @@ libraries:
 
 
 includes:
-- build/appengine-builtins-descriptors/appstats/appstats.yaml
-- build/appengine-builtins-descriptors/deferred/deferred.yaml
-- build/appengine-builtins-descriptors/ereporter/ereporter.yaml
+#- build/appengine-builtins-descriptors/appstats/appstats.yaml
+#- build/appengine-builtins-descriptors/deferred/deferred.yaml
+#- build/appengine-builtins-descriptors/ereporter/ereporter.yaml
 #- build/appengine-builtins-descriptors/mapreduce/mapreduce.yaml
-- build/appengine-builtins-descriptors/remoteapi/remoteapi.yaml
+#- build/appengine-builtins-descriptors/remoteapi/remoteapi.yaml
 
 
 inbound_services:
@@ -90,13 +87,14 @@ skip_files:
 - ^(.*/)?\.git/.*
 - ^(.*/)?\.svn/.*
 
-- ^(.*/)?logs/.*
+- ^(.*/)?\.logs/.*
 - ^(.*/)?\.data/.*
-- ^(.*/)?.build/.*
-- ^(.*/)?.dist/.*
-- ^(.*/)?.egg-info/.*
-- ^(.*/)?.lint/.*
-- ^(.*/)?.pip/.*
+- ^(.*/)?\.download/.*
+- ^(.*/)?\.build/.*
+- ^(.*/)?\.dist/.*
+- ^(.*/)?\.egg-info/.*
+- ^(.*/)?\.lint/.*
+- ^(.*/)?\.pip/.*
 
 # buildconfig dir
 - ^(.*/)?build/.*
@@ -124,3 +122,4 @@ skip_files:
 - ^(.*/)?gridfs/.*
 - ^(.*/)?mongoengine/.*
 - ^(.*/)?pymongo/.*
+
