@@ -11,19 +11,24 @@
   vertical-align: baseline;
   border-radius: .25em;
 }
+
 .label[href]:hover,
 .label[href]:focus {
   color: #ffffff;
   text-decoration: none;
   cursor: pointer;
 }
+
 .label:empty {
   display: none;
 }
+
 .btn .label {
   position: relative;
   top: -1px;
 }
+
+
 .label-default {
   background-color: #999999;
 }
