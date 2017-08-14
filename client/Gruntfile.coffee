@@ -21,10 +21,10 @@ module.exports = (grunt) ->
   BUILD_DIR                = "build"
   BUILD_DIST_DIR           = "#{BUILD_DIR}/dist"
 
-  # all script, style, img nested under static root..
+  #@ all script, style, img nested under static root..
   BUILD_DIST_STATIC_DIR    = "#{BUILD_DIST_DIR}/static"
 
-  # html files as jinja templates..
+  #@ html files as jinja templates..
   BUILD_DIST_VIEWS_DIR     = "#{BUILD_DIST_DIR}/templates"
   BUILD_TEST_DIR           = "#{BUILD_DIR}/test"
   BUILD_WORKING_DIR        = "#{BUILD_DIR}/working"
@@ -39,7 +39,7 @@ module.exports = (grunt) ->
 
   grunt.initConfig
 
-    # delete the previous build and working directories
+    #@ delete the previous build and working directories
     clean:
       dist:                BUILD_DIST_DIR
       working:             BUILD_WORKING_DIR
@@ -49,7 +49,7 @@ module.exports = (grunt) ->
 
 
     copy:
-      # single page app views..
+      #@ single page app views..
       app_views:
         files: [
           {
@@ -62,7 +62,7 @@ module.exports = (grunt) ->
       app_scripts:
         files: [
           {
-            # copy environ specific overrides..
+            #@ copy environ specific overrides..
             expand:        true
             cwd:           CURRENT_ENV_DIR
             src:           "**"
@@ -104,7 +104,7 @@ module.exports = (grunt) ->
         ]
 
 
-    # stylus css
+    #@ stylus css
     stylus:
       compile:
         src: [
@@ -119,12 +119,12 @@ module.exports = (grunt) ->
       app:
         src: "#{BUILD_WORKING_DIR}/**/*.coffee"
         dest: "#{BUILD_WORKING_DIR}/app.js"
-      # test:
-      #   src: "#{TEST_DIR}/#{APP_DIR}/**/*.coffee"
-      #   dest: "#{BUILD_TEST_DIR}/#{APP_DIR}/tests.js"
-      # nodeapp:
-      #   src: "#{NODEAPP_DIR}/**/*.coffee"
-      #   dest: "#{NODEAPP_BUILD_DIR}/app.js"
+      #test:
+      #  src: "#{TEST_DIR}/#{APP_DIR}/**/*.coffee"
+      #  dest: "#{BUILD_TEST_DIR}/#{APP_DIR}/tests.js"
+      #nodeapp:
+      #  src: "#{NODEAPP_DIR}/**/*.coffee"
+      #  dest: "#{NODEAPP_BUILD_DIR}/app.js"
 
 
     concat:
@@ -134,13 +134,13 @@ module.exports = (grunt) ->
           "#{VENDOR_DIR}/**/jquery/*.js",
           "#{VENDOR_DIR}/**/bootstrap/*.js",
           "#{VENDOR_DIR}/**/typo-nodes/*.js",
-          # "#{VENDOR_DIR}/**/angular/angular.min.js",
-          # "#{VENDOR_DIR}/**/angular-resource/angular-resource.min.js",
+          #"#{VENDOR_DIR}/**/angular/angular.min.js",
+          #"#{VENDOR_DIR}/**/angular-resource/angular-resource.min.js",
         ]
         dest: "#{BUILD_DIST_DIR}/vendor.js"
 
       app_scripts:
-        # all our angular components, including views..
+        #@ all angular components, including views..
         src: [
           "#{BUILD_WORKING_DIR}/**/*.js",
         ]
@@ -148,7 +148,7 @@ module.exports = (grunt) ->
 
       vendor_styles:
         src: [
-          # "#{VENDOR_DIR}/**/normalize-css/*.css",
+          #"#{VENDOR_DIR}/**/normalize-css/*.css",
           "#{VENDOR_DIR}/**/bootstrap/*.css",
         ]
         dest: "#{BUILD_DIST_DIR}/vendor.css"
@@ -160,8 +160,8 @@ module.exports = (grunt) ->
         dest: "#{BUILD_DIST_DIR}/app.css"
 
 
-    # inline all angular views as strings into a js file that can be
-    # concatted in the package
+    #@ inline all angular views as strings into a js file that can be
+    #@ concatted in the package
     ngtemplates:
       options:
         base: "#{APP_DIR}"
@@ -171,8 +171,8 @@ module.exports = (grunt) ->
         ]
         dest: "#{BUILD_WORKING_DIR}/ngviews.js"
 
-    # convert our Angular files that use simple injects to their build-safe
-    # versions
+    #@ convert our Angular files that use simple injects to their build-safe
+    #@ versions
     ngmin:
       app:
         expand: true
@@ -186,19 +186,19 @@ module.exports = (grunt) ->
         src: ["#{BUILD_DIST_DIR}/app.js"]
 
 
-    # replace all the script tags in the HTML file with the single
-    # built script
+    #@ replace all the script tags in the HTML file with the single
+    #@ built script
     htmlrefs:
       options:
         file:
-          # todo: generate unique from contents of file for each file..
+          #@ <TODO> generate unique from contents of file for each file..
           buildNumber: 47878
       build:
         src:  ["#{BUILD_WORKING_DIR}/*.html"]
         dest: "#{BUILD_DIST_DIR}/"
 
 
-    # minify html files
+    #@ minify html files
     htmlmin:
       index:
         options:
@@ -206,9 +206,9 @@ module.exports = (grunt) ->
           collapseWhitespace: false
         files:
           "build/dist/index.html": "#{BUILD_DIST_DIR}/index.html"
-          # "build/dist/login.html": "#{BUILD_DIST_DIR}/login.html"
+          #"build/dist/login.html": "#{BUILD_DIST_DIR}/login.html"
 
-    # minify the js file to be as small as possible
+    #@ minify the js file to be as small as possible
     uglify:
       app_scripts:
         src: ["#{BUILD_DIST_DIR}/app.js"]
@@ -223,21 +223,21 @@ module.exports = (grunt) ->
         dest: "#{BUILD_DIST_DIR}/app.css"
 
 
-    # for tests that run in browsers
+    #@ for tests that run in browsers
     karma:
-      # start karma server
-      # (the watch task will run the tests when files change)
+      #@ start karma server
+      #@ (the watch task will run the tests when files change)
       unit:
         configFile: "config/karma.conf.js"
 
-      # continuous integration mode for the package:
-      # run tests once in PhantomJS browser.
+      #@ continuous integration mode for the package:
+      #@ run tests once in PhantomJS browser.
       continuous:
         configFile: "config/karma.conf.js"
         singleRun: true
         browsers: ["PhantomJS"]
 
-    # for tests that run in Node
+    #@ for tests that run in Node
     simplemocha:
       options:
         require: "should"
@@ -254,7 +254,7 @@ module.exports = (grunt) ->
           base: NODEAPP_BUILD_DIR
 
 
-    # watches for changes in file to fire tasks
+    #@ watches for changes in file to fire tasks
     watch:
       gruntfile:
         files: 'Gruntfile.js'
@@ -303,7 +303,7 @@ module.exports = (grunt) ->
   grunt.loadNpmTasks 'grunt-clear'
   grunt.loadNpmTasks 'grunt-htmlrefs'
   grunt.loadNpmTasks 'grunt-simple-mocha'
-  # grunt.loadNpmTasks 'grunt-karma'
+  #grunt.loadNpmTasks 'grunt-karma'
   grunt.loadNpmTasks 'grunt-ngmin'
 
 
@@ -312,7 +312,7 @@ module.exports = (grunt) ->
   # alias tasks
   ###############################################################
 
-  # grunt.registerTask 'test', ['karma:continuous']
+  #grunt.registerTask 'test', ['karma:continuous']
 
   ###
    * build task explanation
@@ -328,16 +328,16 @@ module.exports = (grunt) ->
    * 10. delete the BUILD_DIR
   ###
   grunt.registerTask "build", [
-    #@ clear previous build package
+    #@ CLEAR PREVIOUS BUILD ..
     "clean:dist",
 
-    #@ jquery build
+    #@ JQUERY BUILD
     "copy",
     "stylus",
     "coffee",
 
-    #@ angularjs build..
-    # "copy", "stylus", "coffee", "ngtemplates", "ngmin",
+    #@ ANGULARJS BUILD..
+    #"ngtemplates", "ngmin",
 
     # "jshint",
     "clean:build",
@@ -349,11 +349,11 @@ module.exports = (grunt) ->
   grunt.registerTask "dist", [
     "build",
     "concat",
-    # "uglify",
-    # "cssmin",
+    #"uglify",
+    #"cssmin",
     "htmlrefs",
     "htmlmin",
 
-    #@ clear build compilation dir
+    #@ CLEAR INTERMEDIATE BUILD ..
     "clean:working",
   ]

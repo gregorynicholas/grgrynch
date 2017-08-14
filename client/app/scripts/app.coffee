@@ -1,15 +1,16 @@
 
 # $win = $ window
+win = window
 $doc = $ document
 $body = $ document.body
 
 
-fps_ms = 1000        #@ frames per second, for a nice, smooth buttox
+fps_ms = 1000       #@ frames per second.. for a nice, smooth buttox
 fps_rt = 60
 fps = fps_ms / fps_rt
 
-is_ticking = false   #@ lock for de-bouncing
-@is_scrolling = false
+is_ticking = false  #@ lock for de-bouncing
+@_is_scrolling = false
 
 @_b6a =
   base: -600
@@ -21,11 +22,11 @@ is_ticking = false   #@ lock for de-bouncing
 
 
 #@ shim layer with setTimeout fallback
-window.requestAnimFrame = (->
-  window.requestAnimationFrame or window.webkitRequestAnimationFrame or window.mozRequestAnimationFrame or window.oRequestAnimationFrame or window.msRequestAnimationFrame or (callback) ->
+win.requestAnimFrame = (->
+  win.requestAnimationFrame or win.webkitRequestAnimationFrame or win.mozRequestAnimationFrame or win.oRequestAnimationFrame or win.msRequestAnimationFrame or (_fn)->
     #@ attempting to throttle number of callbacks when user is paused scrolling ..
-    if is_scrolling
-      window.setTimeout callback, fps
+    if _is_scrolling
+      win.setTimeout _fn, fps
     return
 )()
 
@@ -147,7 +148,7 @@ window.requestAnimFrame = (->
 
   onScroll = (evt)->
     # console.info('[app.js]', 'onScroll..', evt)
-    is_scrolling = true
+    _is_scrolling = true
     unless is_ticking
       is_ticking = true
       requestAnimFrame updateElements
@@ -216,4 +217,4 @@ String.prototype.toProperCase = ()->
 
 
 @_stop = ()->
-  is_scrolling = false
+  _is_scrolling = false

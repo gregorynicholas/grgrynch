@@ -12,13 +12,14 @@
 //@import "fonts/itc-charter-bold"
 
 
-//@ responsive-mobile width ..
+//@ RESPONSIVE WIDTHS ..
 //@ ----------------------------------------------------------------------------
-rspnsv-mobile-breakpt = 480px
-rspnsv-dsktop-breakpt = 992px
+$breakpt-mobl = 480px
+$breakpt-tabl = 768px
+$breakpt-desk = 992px
 
 
-//@ app ui vars ..
+//@ APP UI VARS ..
 //@ ----------------------------------------------------------------------------
 app-outer-width = 1400px
 // app-inner-width = 1140px  #<<  <TODO> - 1140 is actual inner width..
@@ -27,8 +28,8 @@ app-inner-width = 1006px
 app-outer-gutters = (app-outer-width - app-inner-width)
 
 //@ offset the inner container by 30%
-outer-padding-left = round(app-outer-gutters * 0.3)
-outer-padding-right = round(app-outer-gutters * 0.7)
+outer-padding-lt = round(app-outer-gutters * 0.3)
+outer-padding-rt = round(app-outer-gutters * 0.7)
 
 header-outer-height = 230px
 header-inner-height = 134px  //<<  height for:  .header-inner
@@ -36,13 +37,13 @@ header-inner-height = 134px  //<<  height for:  .header-inner
 header-inner-gutter = round((header-outer-height - header-inner-height) / 2)
 
 
-// style vars
-// ----------------------------------------------------------------------------
-bgcolor = hsla(0, 0%, 0%, 100)
+//@ STYLE VARS
+//@ ----------------------------------------------------------------------------
+bgcolor = hsla(0, 0%, 0%, 1)
 
 
 html, body
-  min-height 10000px
+  min-height 2000px
   background-color bgcolor
   font-family Helvetica, Arial, sans-serif
   line-height initial
@@ -51,23 +52,31 @@ html, body
 
 
 body
-  background-image url('/img/bg/_H3A0494_gregory_nicholas_@1x.jpg')
+  background-image url('/img/bg/_H3A0494b_gregory_nicholas_@1x.jpg')
   background-repeat no-repeat
-  background-size cover
+  -webkit-background-size auto 100%
+  -moz-background-size auto 100%
+  -ms-background-size auto 100%
+  -o-background-size auto 100%
+  background-size auto 100%
   background-attachment fixed
-  background-position 0px 0px
+  background-position center 0px
 
 
 
-//@ screen responsiveness
+//@ SCREEN RESPONSIVENESS
 
-@media (min-width: 480px)
+//@ phone: portrait and landscape..
+@media (min-device-width: 320px) and (max-device-width: 480px)
   .app-outer
-    padding-left round(outer-padding-left / 2)
+    padding-left round(outer-padding-lt / 2)
+
+//@ tablet: portrait and landscape..
+// @media (min-device-width: 768px) and (max-device-width: 1024px)
 
 
 
-//@ adjust the header
+//@ ADJUST THE HEADER
 
 @media (min-width: 480px)
   header
@@ -94,9 +103,9 @@ body
 
   .app-outer
     //@ subtract the padding
-    //@ width = (app-outer-width - (outer-padding-left + outer-padding-right))
+    //@ width = (app-outer-width - (outer-padding-lt + outer-padding-rt))
     width app-outer-width
-    padding-left outer-padding-left
+    padding-left outer-padding-lt
 
   .app-inner
     width app-inner-width
@@ -143,8 +152,8 @@ header
     &.animated-gif
       background-image url('/img/header-03-logo.gif')
 
-    // &.animated-css3
-    //   background-image url('/img/header-03-logo-ring.png')
+    //&.animated-css3
+    //  background-image url('/img/header-03-logo-ring.png')
 
     .gregorynicholas-logo
       width 125px
@@ -161,309 +170,126 @@ header
   margin-top header-inner-gutter
 
 
-.bordered
-  border-bottom solid 1px #fff
 
 
-act-title-height = 440px
 
-.act-title
-  height act-title-height
-  border-top solid 1px #fff
-  border-bottom solid 1px #fff
-  text-align center
-  vertical-align middle
-  line-height act-title-height
 
 
-// parallax
 
-// #blob-1,
-// #blob-2,
-// #blob-3,
-// #blob-4,
-// #blob-5,
-// #blob-6,
-// #blob-7,
-// #blob-8,
-// #blob-9
-//   // display none
-//   // position absolute
-//   z-index 0
+//@@
+//@ SECTION-ABOUT
+//@
+.section-about
 
+  .title
+    font-family serif
+    font-size 2em
+    text-transform lowercase
 
-#section-04,
-#section-08
-  overflow hidden
+  .summary
+    font-family serif
+    font-size 1.5em
+    text-transform lowercase
 
 
-//@ intro
+//@@
+//@ SECTION-SKILLS
+//@
+.section-skills
 
-#section-01-a
-  width 1006px
-  padding-top 245px
+  .skill
+    overflow hidden
+    text-indent -9999px
+    background-image url('')
+    background-position center center
+    background-repeat no-repeat
+    background-color hsla(0, 2%, 2%, 1)
 
-#section-01-b
-  padding-top 45px
+    min-height 200px
 
-#section-01-c
-  padding-top 45px
-  //@ add additional margin between act-i-title
-  padding-bottom 95px * 2
 
 
-//@ height-fix for act-i-title
-#section-02
-  height act-title-height * 1.2
-  line-height act-title-height * 1.2
-  overflow hidden
-  margin-top act-title-height
+//@@
+//@ SECTION-CONTACT-CTA-01
+//@
+.section-contact-cta
 
+  .contact-cta-01
+    font-family serif
+    font-size 2em
+    text-transform uppercase
 
-#section-03
-  height 393px
-  margin-bottom 180px
 
-  div
-    background url('/img/narrative/bgs/03-vael-intro-bg.jpg') no-repeat top center
-    width 1139px
-    height 392px
-    margin-left -66px
-    position absolute
+//@@
+//@ SECTION-COMPANIES
+//@
+.section-companies
 
+  .company
+    overflow hidden
+    text-indent -9999px
+    background-image url('')
+    background-position center center
+    background-repeat no-repeat
+    background-color hsla(0, 2%, 2%, 1)
 
-//@ fucking down
-#section-04
-  padding-bottom 120px
+    min-height 200px
 
 
-//@ coleman intro
-#section-05
-  // margin-bottom 178px
-  margin-bottom 300px
 
+//@@
+//@ SECTION-PROJECTS
+//@
+.section-projects
 
-//@ 600 sq ft
-#section-06-a
-  text-align center
-  margin-bottom 48px
-  img
-    margin 0 auto
+  .project
 
+    .project-title
+      font-family serif
+      font-size 2em
+      text-transform uppercase
 
-#section-06-b
-  text-align center
-  margin-bottom 142px
-  margin-left 118px
+    .project-media
+      min-width 100%
+      min-height 300px
+      background-color hsla(0, 2%, 2%, 1)
 
 
-//@ blew it
-#section-07
-  text-align center
-  min-height 466px
+//@@
+//@ SECTION-CONTACT-CTA-02
+//@
+.section-contact-cta
 
-  div
-    background url('/img/narrative/bgs/07-blew-it-bg.jpg') no-repeat top center
-    width 740px
-    height 466px
-    margin-left 144px
-    position absolute
+  .contact-cta-02
+    font-family serif
+    font-size 2em
+    text-transform uppercase
 
 
-//@ act-ii-title dropt
-#section-08
-  margin-bottom 250px
-  div
-    width 1006px
-    height 440px
-    position absolute
-  img
-    margin 0 auto
-    margin-top 200px
+//@@
+//@ SECTION-INVESTORS
+//@
+.section-investors
 
-
-#section-09
-  margin-bottom 240px
-  text-align center
-
-
-//@ instagram pull quote
-#section-10
-  padding-bottom 170px
-
-
-#section-11
-  padding-bottom 30px
-  margin-bottom 210px
-  text-align center
-
-
-// angelpad acceptable
-#section-12
-  margin-bottom 300px
-  text-align center
-
-
-// demo-day
-#section-13
-  // margin-bottom 110px
-  margin-bottom 500px
-
-
-// act-iii-title pict pivot
-#section-14
-  margin-bottom 120px
-
-
-// no glory
-#section-15
-  margin-bottom 70px
-  text-align center
-
-
-// portfolio logos
-#section-16
-  text-align center
-  padding-bottom 112px
-  margin-bottom 130px
-
-
-// domain swoop
-#section-17
-  text-align center
-  padding-bottom 600px
-
-
-// act-iv-title unvael
-#section-18
-  margin-bottom 110px
-
-
-// pict acquisition
-#section-19
-  text-align center
-  padding-bottom 110px
-  margin-bottom 150px
-
-
-// fuck textbook
-#section-20
-  margin-bottom 55px
-
-
-// unvael intro
-#section-21
-  height 145px
-
-
-// cultural mecca
-#section-22
-  padding-bottom 80px
-  margin-bottom 120px
-
-
-// unvael's voice
-#section-23
-  text-align center
-  padding-bottom 105px
-
-
-// atypical founder
-#section-24
-  text-align center
-  padding-bottom 105px
-
-
-.bordered-01
-.bordered-02
-  margin 0 auto
-
-
-.bordered-01
-  width 38px
-  margin-bottom 100px
-
-
-.bordered-02
-  width 26px
-  margin-bottom 100px
-
-
-#blob-container
-  position absolute
-  left 0
-  top 0
-  width 960px
-  height 3000px
-  overflow hidden
-
-
-
-
-.js-scroll-appear,
-.js-scroll-appear div,
-.js-scroll-appear img
-  -webkit-transition all 1.4s ease-in-out
-  -moz-transition all 1.4s ease-in-out
-  -o-transition all 1.4s ease-in-out
-  transition all 1.4s
-
-.js-scroll-appear.header-inner
-.js-scroll-appear.header-inner div
-.js-scroll-appear.header-inner img
-  -webkit-transition all 0.8s ease-out
-  -moz-transition all 0.8s ease-out
-  -o-transition all 0.8s ease-out
-  transition all 0.8s
-
-#section-01-a
-  -webkit-transition all 0.1s ease-in-out
-  -moz-transition all 0.1s ease-in-out
-  -o-transition all 0.1s ease-in-out
-  transition all 0.1s
-
-#section-01-b
-  -webkit-transition all 0.1s ease-in-out
-  -moz-transition all 0.1s ease-in-out
-  -o-transition all 0.1s ease-in-out
-  transition all 0.1s
-
-#section-11 div
-  -webkit-transition all 2s ease-in-out
-  -moz-transition all 2s ease-in-out
-  -o-transition all 2s ease-in-out
-  transition all 2s
-
-#section-20
-  -webkit-transition all 4s ease-in-out
-  -moz-transition all 4s ease-in-out
-  -o-transition all 4s ease-in-out
-  transition all 4s
-  height 34px
-
-  img
-    position absolute
-    margin-left -100px
-
-  &.appear
-    img
-      margin-left 0
-
-
-#section-07
-  img
-    margin-top 200px
-
-  &.appear
-    img
-      margin-top 0
-
-.js-scroll-appear
-  div,
-  img
-    opacity 0
-
-  &.appear
-    div,
-    img
-      opacity 1
+  .investor
+    overflow hidden
+    text-indent -9999px
+    background-image url('')
+    background-position center center
+    background-repeat no-repeat
+    background-color hsla(0, 2%, 2%, 1)
+
+    min-height 200px
+
+
+  .investors.investors-venture-funds
+    margin-top 20px
+    margin-bottom 20px
+    padding-top 20px
+    padding-bottom 20px
+
+  .investors.investors-angels
+    margin-top 20px
+    margin-bottom 20px
+    padding-top 20px
+    padding-bottom 20px
