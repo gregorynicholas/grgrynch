@@ -65,12 +65,13 @@ builtins:
 {% endfor %}
 
 
-#@ forces precompilation on deploy.
+#@ forces precompilation on deploy..
 derived_file_type:
 - python_precompiled
 
 
 skip_files:
+
 - ^(.*/)?.*\.py[co]
 - ^(.*/)?.*/RCS/.*
 - ^(.*/)?\.bak
@@ -79,12 +80,12 @@ skip_files:
 - ^(.*/)?\.rc
 - ^(.*/)?\.sh
 
+- ^(.*/)?Icon
 - ^(.*/)?requirements.txt
 - ^(.*/)?.*\.yml
 - ^(.*/)?.*\.yaml
 - ^(.*/)?.*~
 - ^(.*/)?\..*
-- ^(.*/)?\.git/.*
 - ^(.*/)?\.svn/.*
 
 - ^(.*/)?\.logs/.*
@@ -94,16 +95,20 @@ skip_files:
 - ^(.*/)?\.dist/.*
 - ^(.*/)?\.egg-info/.*
 - ^(.*/)?\.lint/.*
+- ^(.*/)?\.git/.*
 - ^(.*/)?\.pip/.*
+- ^(.*/)?\.wiki/.*
 
 # buildconfig dir
+- ^(.*/)?bin/.*
 - ^(.*/)?build/.*
 
 # client
 - ^(.*/)?client/.*
+- ^(.*/)?client/node_modules.*
 - ^(.*/)?ui/.*
 
-- ^(.*/)?django/.*
+# - ^(.*/)?django/.*
 - ^(.*/)?docs/.*
 - ^(.*/)?lib/wtforms/ext/i18n/.*
 
@@ -114,6 +119,9 @@ skip_files:
 # tests
 - ^(.*/)?testsuite/.*
 - ^(.*/)?tests/.*
+- ^(.*/)?test/.*
+- ^(.*/)?test\.py
+- ^(.*/)?tests\.py
 - ^(.*/)?_tests\.py
 
 # mongoengine

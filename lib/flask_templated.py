@@ -23,18 +23,18 @@ __all__ = [
 
 
 def render(template=None):
-  def decorator(f):
-    @wraps(f)
+  def decorator(_fn):
+    @wraps(_fn)
     def wrapped(*args, **kwargs):
-      tname = template
-      if tname is None:
-        tname = request.endpoint.replace(".", "/") + ".html"
-      ctx = f(*args, **kwargs)
+      template_name = template
+      if template_name is None:
+        template_name = request.endpoint.replace(".", "/") + ".html"
+      ctx = _fn(*args, **kwargs)
       if ctx is None:
         ctx = {}
       elif not isinstance(ctx, dict):
         return ctx
-      return render_template(tname, **ctx)
+      return render_template(template_name, **ctx)
     return wrapped
   return decorator
 

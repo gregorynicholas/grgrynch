@@ -2,9 +2,19 @@
   grgrynch.appengine_config
   ~~~~~~~~~~~~~~~~~~~~~~~~~
 
+
   :copyright: (c) by gregorynicholas.
+
 """
 from __future__ import unicode_literals
+
+import logging
+logging.getLogger().setLevel(logging.DEBUG)
+
+from google.appengine.api.logservice import logservice
+from textwrap import dedent
+
+
 from app import include_paths
 
 #@ set the python runtime to 2.7 for the deferred lib wants to default to

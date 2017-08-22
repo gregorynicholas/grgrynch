@@ -127,7 +127,6 @@ supervisorctl stop devappserver-local;
 #### RELEASE, DEPLOY COMMANDS:
 
 ```sh
-
 #@ RELEASE + DEPLOY
 #@
 paver dist_build --env_id qa;

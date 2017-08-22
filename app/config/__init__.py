@@ -41,14 +41,14 @@ class Config(AppConfig):
   env_id = env_id
   #: prevents a weird bubbling of bad request errors for missing form params.
   TRAP_BAD_REQUEST_ERRORS = True
-  DEBUG = True
+  DEBUG = False
   TESTING = False
   CSRF_ENABLED = False
   # CSRF_SESSION_KEY = keys.SESSION_KEY
   jinja_strict_undefined = False
 
   #: flask-debugtoolbar settings
-  DEBUG_TB_PROFILER_ENABLED = True
+  DEBUG_TB_PROFILER_ENABLED = False
   DEBUG_TB_INTERCEPT_REDIRECTS = False
 
   #: flask-cache settings
@@ -58,8 +58,8 @@ class Config(AppConfig):
   # SESSION_PROTECTION = "strong"
   # SESSION_COOKIE_NAME = "session"
 
-  # set secret keys for csrf protection
-  flask_debug = True
+  #@ set secret keys for csrf protection
+  flask_debug = False
   flask_secret_key = keys.FLASK_SECRET_KEY
   flask_session_cookie_secure = True
   flask_remember_cookie_name = "session"

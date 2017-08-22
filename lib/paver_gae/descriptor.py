@@ -119,10 +119,10 @@ def build_descriptors(dest, env_id, ver_id=None):
   api_version = 1
 
 
-  _builtins = [
-    'deferred',
-  ]
+  _builtins = []
 
+  if env_id in ('prod', 'integration'):
+    _builtins.append('deferred')
 
   _inbound_services = []
   if env_id in ('prod', 'integration'):
@@ -135,12 +135,11 @@ def build_descriptors(dest, env_id, ver_id=None):
       'name': 'jinja2',
       'version': '2.6',
     },
-    {
-      'name': 'lxml',
-      'version': '2.3',
-    },
+    #{
+    #  'name': 'lxml',
+    #  'version': '2.3',
+    #},
   ]
-
 
   context = dict(
     app_id=opts.proj.app_id,

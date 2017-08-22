@@ -24,18 +24,18 @@ from app.models import user
 
 __all__ = [
   'index_get',
-  'favicon',
   'login_get',
   'logout_get',
   'admin_get',
   'test_signin_get',
+  'browser_icons',
 ]
 
 
 debug = False
 log = getLogger(__name__)
 if debug:
-  log.info("starting views.")
+  log.info("initializing views ..")
 
 
 # jinja2 template configuration
@@ -50,9 +50,11 @@ def index_get(subdomain=None):
 
 
 @flaskapp.route("/favicon.ico", subdomain="<subdomain>", methods=["GET"])
-def favicon(subdomain=None):
+@flaskapp.route("/apple-touch-icon.png", subdomain="<subdomain>", methods=["GET"])
+@flaskapp.route("/apple-touch-icon-precomposed.png", subdomain="<subdomain>", methods=["GET"])
+def browser_icons(subdomain=None):
   """
-  because chrome won't not try to prefetch this, even if it doesn't exist.
+  because chrome won't not try to prefetch this, even if it doesn't exist..
   """
   return Response("", 200)
 
@@ -84,7 +86,7 @@ def admin_get():
   return {}
 
 
-@flaskapp.route("/test_signin", methods=["GET"])
+@flaskapp.route("/account/signin/test", methods=["GET"])
 def test_signin_get():
   u = user.User.get_by_id("testing")  # todo
   u.roles = ["admin"]

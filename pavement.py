@@ -401,6 +401,7 @@ def dist_build(options):
     ".logs",
     ".wiki",
 
+    "bin",
     "build",
     "client",
     "docs",
