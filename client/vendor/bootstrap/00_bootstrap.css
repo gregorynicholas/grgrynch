@@ -8,6 +8,7 @@
 
 
 * {
+  cursor: default;
   -webkit-touch-callout: none;
   -webkit-user-select: none;
      -moz-user-select: none;
@@ -20,9 +21,7 @@
       -ms-tap-highlight-color: rgba(0, 0, 0, 0);
        -o-tap-highlight-color: rgba(0, 0, 0, 0);
           tap-highlight-color: rgba(0, 0, 0, 0);
-}
 
-* {
   -webkit-box-sizing: border-box;
      -moz-box-sizing: border-box;
           box-sizing: border-box;
@@ -37,7 +36,8 @@
 
 
 html {
-  font-size: 62.5%;
+  /*font-size: 62.5%;*/
+  font-size: 80%;
   font-family: sans-serif;
 
   /* see https://developer.mozilla.org/en-US/docs/Web/CSS/text-size-adjust */
@@ -461,6 +461,7 @@ select[size] {
 /* > form-inputs-date.css */
 /* > form-inputs-search.css */
 /* > form-inputs-file.css */
+/* > form-inputs-number.css */
 /* > form-inputs-radio-checkbox.css */
 /* > form-inputs-sm.css */
 /* > form-inputs-lg.css */
@@ -487,6 +488,7 @@ select[size] {
 /* > close.css */
 /* > modal.css */
 /* > tooltip.css */
+/* > popover.css */
 /* > grid-form-fix.css */
 
 
