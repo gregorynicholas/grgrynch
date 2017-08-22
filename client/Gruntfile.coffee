@@ -133,7 +133,8 @@ module.exports = (grunt) ->
           "#{VENDOR_DIR}/**/modernizr/*.js",
           "#{VENDOR_DIR}/**/jquery/*.js",
           "#{VENDOR_DIR}/**/bootstrap/*.js",
-          "#{VENDOR_DIR}/**/typo-nodes/*.js",
+          "#{VENDOR_DIR}/**/electric-lines/*.js",
+          # "#{VENDOR_DIR}/**/typo-nodes/*.js",
           #"#{VENDOR_DIR}/**/angular/angular.min.js",
           #"#{VENDOR_DIR}/**/angular-resource/angular-resource.min.js",
         ]
@@ -150,6 +151,7 @@ module.exports = (grunt) ->
         src: [
           #"#{VENDOR_DIR}/**/normalize-css/*.css",
           "#{VENDOR_DIR}/**/bootstrap/*.css",
+          "#{VENDOR_DIR}/**/electric-lines/*.css",
         ]
         dest: "#{BUILD_DIST_DIR}/vendor.css"
 

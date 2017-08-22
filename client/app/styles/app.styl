@@ -50,6 +50,8 @@ html, body
   margin 0
   padding 0
   color hsla(100, 100%, 100%, 1)
+  //@ prevents the diag line from overflowing..
+  overflow-x hidden
 
 
 body
@@ -62,7 +64,6 @@ body
   background-size auto 100%
   background-repeat no-repeat
   background-position center 0px
-  overflow-x hidden
 
   // background -moz-linear-gradient(-135deg, rgba(25,25,25, 1) 0%, rgba(0,0,0, 1) 40%)
   // background -webkit-gradient(left top, right bottom, color-stop(0%, rgba(25,25,25, 1)), color-stop(40%, rgba(0,0,0, 1)))
@@ -203,6 +204,7 @@ header
   // font-size 2em
   text-transform uppercase
   font-size 0.8em
+  font-weight 900
   letter-spacing 1.0em
 
 
@@ -210,7 +212,7 @@ header
 //@ SECTION-ABOUT
 //@
 .section-about
-  font-family 'Didot'
+  font-family 'Didot', serif
   font-size 0.8em
   font-style italic
   letter-spacing 0.15em
@@ -220,12 +222,12 @@ header
   min-height 90vh
   margin-bottom 50vh
   padding-bottom 0vh
-  padding-left 450px
+  // padding-left 450px
   // border-top solid 2px hsla(100, 100%, 100%, 1)
   // border-bottom solid 2px hsla(100, 100%, 100%, 1)
 
   .title
-    font-family serif
+    font-family 'Didot', serif
     text-transform lowercase
     font-size 10em
     color hsla(100, 100%, 100%, 1)
@@ -245,7 +247,7 @@ header
 
   .summary
     margin-bottom 100px
-    font-family serif
+    font-family 'Didot', serif
     font-size 1.5em
     text-transform lowercase
 
@@ -269,14 +271,31 @@ header
 
     .logo
       overflow hidden
+      font-family Helvetica, Arial, sans-serif
+      font-weight 900
+      font-size 0.8em
+      white-space nowrap
       text-indent -9999px
+      text-transform uppercase
+      letter-spacing 0.35em
+      line-height 100px
+      color hsla(100, 100%, 100%, 1)
+      background-color hsla(0, 0%, 100%, 0.02)
       background-position center center
       background-repeat no-repeat
-      background-color hsla(0, 0%, 100%, 0.04)
       background-size auto 70%
-
       min-height 100px
       max-height 120px
+
+      &:active,
+      &:focus,
+      &:hover
+        text-indent 0
+        text-align center
+        background-size auto 100%
+        background-image none
+        background-color hsla(0, 0%, 100%, 0.05)
+
 
   .skill-python                   .logo
     background-image url('/img/tech-stack-logos/langs/lang-python/devicons_1-8-0_python_200_0_ffffff_none.png')
@@ -310,42 +329,50 @@ header
   .skill-javascript-angular2      .logo
     background-image url('/img/tech-stack-logos/javascript-client-libraries/angular-js-2/devicons_1-8-0_angular_200_0_ffffff_none.png')
 
-  .skill-node-meteor              .logo
+  .skill-node-meteor  .logo
     background-image url('/img/tech-stack-logos/nodejs-server-frameworks/meteor-js/png/meteor-horizontal-square-wht@2x.png')
-  .skill-node-express             .logo
+  .skill-node-express  .logo
     background-image url('/img/tech-stack-logos/nodejs-server-frameworks/express/png/node-express-horizontal-square-wht@2x.png')
 
-  .skill-python-flask             .logo
+  .skill-python-flask  .logo
     background-image url('/img/tech-stack-logos/python-server-frameworks/flask/flask-horizontal-square-wht@2x.png')
-  .skill-python-django            .logo
+  .skill-python-django  .logo
     background-image url('/img/tech-stack-logos/python-server-frameworks/django/devicons_1-8-0_django_200_0_ffffff_none.png')
+  .skill-ruby-on-rails .logo
+    background-image url('/img/tech-stack-logos/server-frameworks/ruby-on-rails/png/devicons_1-8-0_ruby_on_rails_200_0_ffffff_none.png')
 
-  .skill-continuousint-circleci   .logo
+  .skill-continuousint-circleci  .logo
     background-image url('/img/tech-stack-logos/continuous-integration-frameworks/circleci/circleci-horizontal-square-wht@2x.png')
-  .skill-continuousint-travisci   .logo
+  .skill-continuousint-travisci  .logo
     background-image url('/img/tech-stack-logos/continuous-integration-frameworks/travisci/devicons_1-8-0_travis_200_0_ffffff_none.png')
 
-  .skill-xcode                    .logo
-    background-image url('/img/tech-stack-logos/native-ios-xcode/xcode/xcode.svg')
-  .skill-continuousint-shenzhen   .logo
+  .skill-xcode  .logo
+    background-image url('/img/tech-stack-logos/native-ios-xcode/xcode/png/xcode-icon-wht@3x.png')
+  .skill-continuousint-shenzhen-nomad  .logo
     background-image url('/img/tech-stack-logos/native-ios-xcode/shenzhen-nomad-cli/shenzhen-nomad-cli-horizontal-square-wht@2x.png')
+  .skill-continuousint-fastlaneio  .logo
+    background-image url('/img/tech-stack-logos/native-ios-xcode/fastlaneio/fastlaneio-horizontal-square-wht@2x.png')
+  .skill-continuousint-fabricio  .logo
+    background-image url('/img/tech-stack-logos/native-ios-xcode/fabricio/fabricio-horizontal-square-wht@2x.png')
 
-  .skill-javascript-test-mochajs  .logo
+  .skill-javascript-runner-mochajs  .logo
     background-image url('/img/tech-stack-logos/javascript-runner-frameworks/mocha-js/mochajs-icon-wht@2x.png')
-  .skill-javascript-test-cucumberjs .logo
-    background-image url('/img/tech-stack-logos/server-frameworks/ruby-on-rails/devicons_1-8-0_ruby_on_rails_200_0_ffffff_none.png')
+  .skill-javascript-runner-jasmine  .logo
+    background-image url('/img/tech-stack-logos/javascript-runner-frameworks/jasmine/jasmine-icon-wht@2x.png')
 
-  .skill-css-sass                 .logo
+  .skill-css3  .logo
+    background-image url('/img/tech-stack-logos/css-frameworks/css3/png/devicons_1-8-0_css3_200_0_ffffff_none.png')
+  .skill-css-sass  .logo
     background-image url('/img/tech-stack-logos/css-frameworks/sass/devicons_1-8-0_sass_200_0_ffffff_none.png')
-  .skill-css-stylus               .logo
+  .skill-css-stylus  .logo
     background-image url('/img/tech-stack-logos/css-frameworks/stylus/devicons_1-8-0_stylus_200_0_ffffff_none.png')
 
-  .skill-docker                   .logo
+  .skill-docker  .logo
     background-image url('/img/tech-stack-logos/container-virtualization/docker/docker-horizontal-square-wht@2x.png')
-  .skill-ansible                  .logo
+  .skill-ansible  .logo
     background-image url('/img/tech-stack-logos/python-build-tools/ansible/ansible-wht@2x.png')
-  .skill-boto                     .logo
-    background-image url('/img/tech-stack-logos/server-frameworks/nginx/devicons_1-8-0_nginx_200_0_ffffff_none.png')
+  .skill-server-nginx  .logo
+    background-image url('/img/tech-stack-logos/server-frameworks/nginx/png/nginx-horizontal-square-wht@2x.png')
 
 
 //@@
