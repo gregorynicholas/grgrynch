@@ -26,21 +26,43 @@ var $W = $(W);
 var $D = $(D);
 
 
-(function($Typo) {
+(function($Typo, id, string) {
 
   var $Typo = W.$Typo || {};
   var canvas;
   var context;
+  var raf;
   var mouse = {x:-99999, y:-99999};
   var nodes = [];
   var dirtyRegions = [];
   var inputForce = force = 0;
   var input = forceFactor = false;
-  var FPS = 60;
-  var text = 'gregory' + 'nicholas';
-  var interactive = true;
-  var _node_friction = 0.7;
 
+
+  $Typo.settings = {
+    text: string || 'artist,engineer,cto',
+    fps: 60,
+    interactive: true,
+    node_friction: 0.92,
+    // node_friction: 0.5,
+    // node_friction: 0.35,
+
+    // distance: 25,
+    // distance: 50,
+    distance: 75,
+    // step: 12,
+    step: 24,
+    font_size: null,
+
+    canvas: {
+      x: null,
+      y1: null,
+      y2: null,
+      y3: null,
+      w: null,
+      h: null
+    }
+  };
 
 
   /*
@@ -85,22 +107,26 @@ var $D = $(D);
     context = canvas.getContext('2d');
 
     // events
-    if ('ontouchstart' in W) {
+    if ('ontouchstart' in W || 'touchstart' in W) {
       canvas.addEventListener('touchstart', $Typo.onTouchStart, false);
-      canvas.addEventListener('touchend', $Typo.onTouchEnd, false);
-      canvas.addEventListener('touchmove', $Typo.onTouchMove, false);
+      canvas.addEventListener('touchend',   $Typo.onTouchEnd,   false);
+      canvas.addEventListener('touchcancel',$Typo.onTouchEnd,   false);
+      canvas.addEventListener('touchmove',  $Typo.onTouchMove,  false);
     }
 
     else {
       canvas.addEventListener('mousedown', $Typo.onMouseDown, false);
-      canvas.addEventListener('mouseup', $Typo.onMouseUp, false);
+      canvas.addEventListener('mouseup',   $Typo.onMouseUp,   false);
       canvas.addEventListener('mousemove', $Typo.onMouseMove, false);
 
     }
 
-    $W.on('resize', function(){
-      $Typo._onresize();
-    });
+    //@ <TODO> buggy on chrome mobile ..
+    if (!('ontouchstart' in W) && !('touchstart' in W)) {
+      $W.on('resize', function(){
+        $Typo._onresize();
+      });
+    }
 
     $Typo._build_texture();
 
@@ -111,16 +137,9 @@ var $D = $(D);
     var $body = D.querySelector('body');
     canvas = D.createElement('canvas');
 
-    canvas.id = 'gregorynicholas';
+    canvas.id = 'gregorynicholas-' + id;
     canvas.width  = W.innerWidth;
-    canvas.height = W.innerHeight * 0.75;
-
-    canvas.style.position = 'absolute';
-    canvas.style.top = 0;
-    canvas.style.bottom = 0;
-    canvas.style.left = 0;
-    canvas.style.right = 0;
-    canvas.style.zIndex = 1001;
+    canvas.height = W.innerHeight * 0.78;
 
     // canvas.style.background = '-webkit-radial-gradient(#2bb0cc, #0079a5)';
     // canvas.style.background = '-moz-radial-gradient(#2bb0cc, #0079a5)';
@@ -128,17 +147,8 @@ var $D = $(D);
     // canvas.style.background = '-o-radial-gradient(#2bb0cc, #0079a5)';
     // canvas.style.background = 'radial-gradient(#2bb0cc, #0079a5)';
 
+    $Typo.settings.font_size = Math.floor(canvas.width / 10);
     $body.appendChild(canvas);
-  };
-
-
-  /**
-   * window resize event.
-   */
-  $Typo._onresize = function(){
-    canvas.width = W.innerWidth;
-    canvas.height = W.innerHeight * 0.75;
-    nodes = [], dirtyRegions = [];
   };
 
 
@@ -151,13 +161,23 @@ var $D = $(D);
 
 
   /**
+   * window resize event.
+   */
+  $Typo._onresize = function(){
+    canvas.width = W.innerWidth;
+    canvas.height = W.innerHeight * 0.78;
+    nodes = [];
+    dirtyRegions = [];
+  };
+
+
+  /**
    * mouse-down event.
    */
   $Typo.onMouseDown = function(event) {
     event.preventDefault();
     forceFactor = true;
   };
-
 
   /**
    * mouse-up event.
@@ -166,8 +186,6 @@ var $D = $(D);
     event.preventDefault();
     forceFactor = false;
   };
-
-
 
   /**
    * mouse-move event.
@@ -180,7 +198,6 @@ var $D = $(D);
   };
 
 
-
   /**
    * touch-start event.
    */
@@ -189,8 +206,6 @@ var $D = $(D);
     forceFactor = true;
   };
 
-
-
   /**
    * touch-end event.
    */
@@ -198,8 +213,6 @@ var $D = $(D);
     event.preventDefault();
     forceFactor = false;
   };
-
-
 
   /**
    * touch-move event.
@@ -214,94 +227,95 @@ var $D = $(D);
 
 
   /**
-   * builds texture.
+   * builds the text node-texture.
    */
   $Typo._build_texture = function() {
-    context.clearRect(0, 0, canvas.width, canvas.height);
+    $Typo._clear();
 
-    // Let's start by drawing the original texture
+    //@ start by drawing the original texture ..
     if (nodes.length === 0) {
 
-      var _size = canvas.width / 10;
       var _step = 12;
 
-      var _canvas = {
-        width:  canvas.width * 0.5,
-        height: canvas.height * 0.5
-      };
+      $Typo.settings.canvas.w = canvas.width * 0.5;
+      $Typo.settings.canvas.h = canvas.height * 0.75;
 
-      context.font = _size + 'px "Arial"';
-      // context.fillStyle = 'rgba(0, 0, 0, 1)';
-      context.fillStyle = 'rgba(235, 235, 235, 1)';
+      context.font = _font_size + 'px Arial';
+      // context.fillStyle = 'rgba(0, 0, 0, 1.0)';
+      // context.fillStyle = 'rgba(235, 235, 235, 1.0)';
+      context.fillStyle = 'rgba(255,255,255, 1.0)';
       context.textAlign = 'center';
       context.fontWeight = 'bold';
-      context.fillText(
-        text, _canvas.width, _canvas.height);
+      context.fillText($Typo.settings.text, $Typo.settings.canvas.w, $Typo.settings.canvas.h);
 
+      var _surface = context.getImageData(0, 0, canvas.width, canvas.height);
 
-      var surface = context.getImageData(0, 0, canvas.width, canvas.height);
+      $Typo._clear();
 
-      context.clearRect(0, 0, canvas.width, canvas.height);
+      for (var width = 0;  width < _surface.width;  width += _step) {
+        for (var height = 0;  height < _surface.height;  height += _step) {
 
-      for (var width = 0; width < surface.width; width += _step) {
-        for (var height = 0; height < surface.height; height += _step) {
+          //@ if pixel-color is white, then draw a node for it ..
+          var _color = _surface.data[(height * _surface.width * 4) + (width * 4) - 1];
 
-          var color = surface.data[(height * surface.width * 4) + (width * 4) - 1];
+          if (_color !== 255)
+            continue;
 
-          // the pixel color is white? so draw on it...
-          if (color === 255) {
+          var _x = $Typo.settings.canvas.w;
+          var _y = $Typo.settings.canvas.h;
 
-            var x, y, radius;
+          var _radius = 1 + (Math.random() * 20);
 
-            x = _canvas.width;
-            y = _canvas.height;
+          nodes.push({
+            x: _x,
+            y: _y,
+            vx: 0,
+            vy: 0,
+            goalX: width + (Math.random() * 20),
+            goalY: height + (Math.random() * 20),
+            radius: _radius
+          });
 
-            radius = 2 + Math.random() * 5;
+          dirtyRegions.push({
+            x: _x,
+            y: _y,
+            radius: _radius
+          });
 
-            nodes.push({
-              x: x,
-              y: y,
-              vx: 0,
-              vy: 0,
-              goalX: width,
-              goalY: height,
-              radius: radius
-            });
-
-            dirtyRegions.push({
-              x: x,
-              y: y,
-              radius: radius
-            });
-
-          }
         }
       }
     }
 
-
-    // kick-off
-    $Typo._clear();
+    //@ kick-off..!
+    $Typo._clear_dirty();
     $Typo._update();
     $Typo._render();
     requestAnimFrame($Typo._build_texture);
   };
 
 
+  $Typo._clear = function() {
+    context.clearRect(0, 0, canvas.width, canvas.height);
+  };
+
 
   /**
-   * clears only dirty regions.
+   * clears regions marked as "dirty"
    */
-  $Typo._clear = function() {
+  $Typo._clear_dirty = function() {
 
-    [].forEach.call(dirtyRegions, function(dirty, index) {
-      var x, y, width, height;
-      width = (2 * dirty.radius) + 4;
-      height = width;
-      x = dirty.x - (width / 2);
-      y = dirty.y - (height / 2);
+    [].forEach.call(dirtyRegions, function(dirty, idx) {
+      var _w = (2 * dirty.radius) + 4;
 
-      context.clearRect(Math.floor(x), Math.floor(y), Math.ceil(width), Math.ceil(height));
+      var _x = dirty.x - (_w / 2);
+      var _y = dirty.y - (_w / 2);
+
+      _w = Math.ceil(_w);
+      _x = Math.floor(_x);
+      _y = Math.floor(_y);
+
+      context.clearRect(_x, _y, _w, _w);
+
     });
 
   };
@@ -313,26 +327,30 @@ var $D = $(D);
    */
   $Typo._update = function() {
     var _force = 0.0001;
-    var _distance = 25;
+    var _texture_line_w = 2;
+    var _texture_line_c = 'rgba(255,255,255, 0.9)';
+    var _text_width = context.measureText($Typo.settings.text).width;
+    var _node_length = nodes.length;
 
-    [].forEach.call(nodes, function(node, index) {
-      if (!interactive) {
-        mouse.x = canvas.width * 0.5 + Math.sin(force) * context.measureText(text).width * 0.5;
+
+    [].forEach.call(nodes, function(node, _node_idx) {
+
+      if (!$Typo.settings.interactive) {
+        mouse.x = canvas.width * 0.5 + Math.sin(force) * _text_width * 0.5;
         mouse.y = canvas.height * 0.47;
         force += _force;
       }
 
       var _angle = Math.atan2(node.y - mouse.y, node.x - mouse.x);
+      var _mouse_distance = $Typo._distance_to(mouse, node, true);
 
-      // node-easing
-      node.vx += Math.cos(_angle) * $Typo._distance_to(
-        mouse, node, true) + (node.goalX - node.x) * 0.1;
-      node.vy += Math.sin(_angle) * $Typo._distance_to(
-        mouse, node, true) + (node.goalY - node.y) * 0.1;
+      //@ node velocity easing
+      node.vx += Math.cos(_angle) * _mouse_distance + (node.goalX - node.x) * 0.1;
+      node.vy += Math.sin(_angle) * _mouse_distance + (node.goalY - node.y) * 0.1;
 
-      // node-friction
-      node.vx *= _node_friction;
-      node.vy *= _node_friction;
+      //@ node velocity friction
+      node.vx *= $Typo.settings.node_friction;
+      node.vy *= $Typo.settings.node_friction;
 
       node.x += node.vx;
       node.y += node.vy;
@@ -346,22 +364,27 @@ var $D = $(D);
         // inputForce = Math.min(inputForce - 1, 500);
       }
 
+      //@ check neighboring nodes..
 
-      // check a neighborhood node
-      for(var nextMolecule = index + 1; nextMolecule < nodes.length; nextMolecule++) {
+      for (var _next_idx = _node_idx+1; _next_idx < _node_length; _next_idx++) {
 
-        var _other_molecule = nodes[nextMolecule];
+        var _next_node = nodes[_next_idx];
 
-        // oh we've found one ..
-        if ($Typo._distance_to(node, _other_molecule) < _distance) {
+        //@ oh we've found one ..
+
+        var _next_distance = $Typo._distance_to(node, _next_node);
+        if (_next_distance < $Typo.settings.distance) {
+          var _alpha = 1 - (_next_distance / 100);
+
           context.save();
           context.beginPath();
-          context.globalCompositeOperation = 'destination-over';
-          context.globalAlpha = 1 - $Typo._distance_to(node, _other_molecule) / 100;
-          context.lineWidth = 1;
-          context.strokeStyle = 'rgba(255,255,255, 0.9)';
+          // context.globalCompositeOperation = 'destination-over';
+          context.globalCompositeOperation = 'lighten';
+          context.globalAlpha = _alpha;
+          context.lineWidth = _texture_line_w;
+          context.strokeStyle = _texture_line_c;
           context.moveTo(node.x, node.y);
-          context.lineTo(_other_molecule.x, _other_molecule.y);
+          context.lineTo(_next_node.x, _next_node.y);
           context.stroke();
           context.closePath();
           context.restore();
@@ -389,7 +412,7 @@ var $D = $(D);
       context.fill();
       context.restore();
 
-      // dirty regions
+      //@ mark 'dirty' regions
       dirtyRegions[index].x = node.x;
       dirtyRegions[index].y = node.y;
       dirtyRegions[index].radius = node.radius;
@@ -403,14 +426,15 @@ var $D = $(D);
    * distance between two points.
    */
   $Typo._distance_to = function(pointA, pointB, angle) {
-    var dx = Math.abs(pointA.x - pointB.x);
-    var dy = Math.abs(pointA.y - pointB.y);
+    var absdx = Math.abs(pointA.x - pointB.x);
+    var absdy = Math.abs(pointA.y - pointB.y);
+    var sqrt = Math.sqrt(absdx * absdx + absdy * absdy);
 
     if (angle) {
-      return (1000 + (interactive ? inputForce : 0)) / Math.sqrt(dx * dx + dy * dy);
+      return (1000 + ($Typo.settings.interactive ? inputForce : 0)) / sqrt;
     }
     else {
-      return Math.sqrt(dx * dx + dy * dy);
+      return sqrt;
     }
   };
 
@@ -422,13 +446,13 @@ var $D = $(D);
    */
   W.requestAnimFrame = (function() {
     return (
-      W.requestAnimationFrame   ||
+      W.requestAnimationFrame       ||
       W.webkitRequestAnimationFrame ||
       W.mozRequestAnimationFrame    ||
       W.oRequestAnimationFrame      ||
       W.msRequestAnimationFrame     ||
-      function(callback) {
-        W.setTimeout(callback, 1000 / FPS);
+      function(_fn) {
+        W.setTimeout(_fn, 1000 / $Typo.settings.fps);
       }
     );
   })();
@@ -442,4 +466,10 @@ var $D = $(D);
   });
 
 
-})($Typo);
+})($Typo, '01');
+
+
+// $Typo('artist');
+// $Typo('engineer');
+// $Typo('cto');
+

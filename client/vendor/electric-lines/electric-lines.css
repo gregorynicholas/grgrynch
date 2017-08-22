@@ -1,0 +1,25 @@
+
+#container  {
+  width : 100%;
+  height : 100%;
+  position : absolute;
+  top : 0px;
+  left : 0px;
+  margin : 0px;
+  padding : 0px;
+}
+
+
+#title {
+  pointer-events: none;
+  /*   color : #2DEBAE; */
+  color : #fff;
+  font-family: 'Montserrat', serif;
+  font-size: 2em;
+  font-weight: 900;
+  letter-spacing: 0.5em;
+  position : absolute;
+  top : 50vh;
+  left : 10vw;
+  text-transform: uppercase;
+}

@@ -21,10 +21,10 @@ $breakpt-desk = 992px
 
 //@ APP UI VARS ..
 //@ ----------------------------------------------------------------------------
-app-outer-width = 1400px
+app-outer-width = 100vw
 // app-inner-width = 1140px  #<<  <TODO> - 1140 is actual inner width..
-app-outer-height = 1400px
-app-inner-width = 1006px
+app-outer-height = 1000px
+app-inner-width = 1400px
 app-outer-gutters = (app-outer-width - app-inner-width)
 
 //@ offset the inner container by 30%
@@ -43,24 +43,33 @@ bgcolor = hsla(0, 0%, 0%, 1)
 
 
 html, body
-  min-height 2000px
+  min-height 1000px
   background-color bgcolor
   font-family Helvetica, Arial, sans-serif
   line-height initial
   margin 0
   padding 0
+  color hsla(100, 100%, 100%, 1)
 
 
 body
-  background-image url('/img/bg/_H3A0494b_gregory_nicholas_@1x.jpg')
-  background-repeat no-repeat
+  // background-image url('/img/bg/_H3A0494b_gregory_nicholas_@1x.jpg')
   -webkit-background-size auto 100%
   -moz-background-size auto 100%
   -ms-background-size auto 100%
   -o-background-size auto 100%
-  background-size auto 100%
   background-attachment fixed
+  background-size auto 100%
+  background-repeat no-repeat
   background-position center 0px
+  overflow-x hidden
+
+  // background -moz-linear-gradient(-135deg, rgba(25,25,25, 1) 0%, rgba(0,0,0, 1) 40%)
+  // background -webkit-gradient(left top, right bottom, color-stop(0%, rgba(25,25,25, 1)), color-stop(40%, rgba(0,0,0, 1)))
+  // background -webkit-linear-gradient(-135deg, rgba(25,25,25, 1) 0%, rgba(0,0,0, 1) 40%)
+  // background -o-linear-gradient(-135deg, rgba(25,25,25, 1) 0%, rgba(0,0,0, 1) 40%)
+  // background -ms-linear-gradient(-135deg, rgba(25,25,25, 1) 0%, rgba(0,0,0, 1) 40%)
+  // background linear-gradient(-135deg, rgba(25,25,25, 1) 0%, rgba(0,0,0, 1) 40%)
 
 
 
@@ -69,7 +78,7 @@ body
 //@ phone: portrait and landscape..
 @media (min-device-width: 320px) and (max-device-width: 480px)
   .app-outer
-    padding-left round(outer-padding-lt / 2)
+    padding-left 10px
 
 //@ tablet: portrait and landscape..
 // @media (min-device-width: 768px) and (max-device-width: 1024px)
@@ -105,11 +114,12 @@ body
     //@ subtract the padding
     //@ width = (app-outer-width - (outer-padding-lt + outer-padding-rt))
     width app-outer-width
-    padding-left outer-padding-lt
+    padding 0
+    margin 0
 
   .app-inner
     width app-inner-width
-    margin-left 40px
+    margin-left 10px
 
 
 header
@@ -123,22 +133,24 @@ header
     background-position right top
     opacity 0.18 !important
 
-  .gregorynicholas-roles
-    //@ width = ~391px
-    height header-inner-height
-    background-image url('/img/header-02-roles.png')
-    background-repeat no-repeat
-    opacity 0.18 !important
-    -webkit-transition opacity 3s ease-in-out
-    -moz-transition opacity 3s ease-in-out
-    -o-transition opacity 3s ease-in-out
-    transition opacity 3s
-    &:hover
-      opacity 0.8
-      -webkit-transition opacity 0.4s ease-in-out
-      -moz-transition opacity 0.4s ease-in-out
-      -o-transition opacity 0.4s ease-in-out
-      transition opacity 0.4s
+
+  // .gregorynicholas-roles
+  //   //@ width = ~391px
+  //   height header-inner-height
+  //   background-image url('/img/header-02-roles.png')
+  //   background-repeat no-repeat
+  //   opacity 0.18 !important
+  //   -webkit-transition opacity 3s ease-in-out
+  //   -moz-transition opacity 3s ease-in-out
+  //   -o-transition opacity 3s ease-in-out
+  //   transition opacity 3s
+  //   &:hover
+  //     opacity 0.8
+  //     -webkit-transition opacity 0.4s ease-in-out
+  //     -moz-transition opacity 0.4s ease-in-out
+  //     -o-transition opacity 0.4s ease-in-out
+  //     transition opacity 0.4s
+
 
   .logo-wrapper
     //@ width = ~125px
@@ -146,23 +158,23 @@ header
     background-repeat no-repeat
     background-position center center
     background-size contain
-    margin-top -30px
-    height 234px
+    margin-top 600px
+    height 334px
+    background-image url('/img/header-03-logo-ring.png')
 
     &.animated-gif
       background-image url('/img/header-03-logo.gif')
 
-    //&.animated-css3
-    //  background-image url('/img/header-03-logo-ring.png')
 
     .gregorynicholas-logo
       width 125px
       height header-inner-height
       background-image url('/img/header-03-logo.png')
       background-repeat no-repeat
+      background-size auto 100%
       margin 0 auto
       transform scale3d(0.5,0.5,0.5)
-      margin-top 30px
+      margin-top 100px
 
 
 .header-inner
@@ -173,67 +185,246 @@ header
 
 
 
+.col.title-txt
+  margin-bottom 50px
 
+.title-txt
+  font-family 'Didot', serif
+  font-style italic
+  letter-spacing 0.20em
+  word-spacing 0.2em
+  text-transform lowercase
+  font-size 3.5em
+  color hsla(100, 100%, 100%, 1)
+  font-weight 100
+
+.sub-title-txt
+  // font-family serif
+  // font-size 2em
+  text-transform uppercase
+  font-size 0.8em
+  letter-spacing 1.0em
 
 
 //@@
 //@ SECTION-ABOUT
 //@
 .section-about
+  font-family 'Didot'
+  font-size 0.8em
+  font-style italic
+  letter-spacing 0.15em
+
+  margin-top 0vh
+  padding-top 40vh
+  min-height 90vh
+  margin-bottom 50vh
+  padding-bottom 0vh
+  padding-left 450px
+  // border-top solid 2px hsla(100, 100%, 100%, 1)
+  // border-bottom solid 2px hsla(100, 100%, 100%, 1)
 
   .title
     font-family serif
-    font-size 2em
     text-transform lowercase
+    font-size 10em
+    color hsla(100, 100%, 100%, 1)
+    font-weight 100
+
+    span
+      background hsla(0, 0%, 0%, 0.5)
+
+    .sub-title
+      color hsla(100, 100%, 100%, 0.7)
+      font-size 0.5em
+      letter-spacing 0.15em
+
+      span
+        background hsla(0, 0%, 0%, 0.5)
+
 
   .summary
+    margin-bottom 100px
     font-family serif
     font-size 1.5em
     text-transform lowercase
+
+
+  .bar-01
+    height 2px
+    background hsla(100, 100%, 100%, 0.3)
+    width 200vw
+    transform rotate(45deg)
+    margin-left -50vw
 
 
 //@@
 //@ SECTION-SKILLS
 //@
 .section-skills
+  margin-bottom 40vh
 
   .skill
-    overflow hidden
-    text-indent -9999px
-    background-image url('')
-    background-position center center
-    background-repeat no-repeat
-    background-color hsla(0, 2%, 2%, 1)
+    margin-bottom 20px
 
-    min-height 200px
+    .logo
+      overflow hidden
+      text-indent -9999px
+      background-position center center
+      background-repeat no-repeat
+      background-color hsla(0, 0%, 100%, 0.04)
+      background-size auto 70%
 
+      min-height 100px
+      max-height 120px
+
+  .skill-python                   .logo
+    background-image url('/img/tech-stack-logos/langs/lang-python/devicons_1-8-0_python_200_0_ffffff_none.png')
+  .skill-javascript               .logo
+    background-image url('/img/tech-stack-logos/langs/lang-javascript/devicons_1-8-0_javascript_200_0_ffffff_none.png')
+  .skill-node                     .logo
+    background-image url('/img/tech-stack-logos/server-frameworks/nodejs/nodejs-horizontal-square-wht@2x.png')
+  .skill-git                      .logo
+    background-image url('/img/tech-stack-logos/langs/lang-git/brandico_2014-04-07_github-text_200_0_ffffff_none.png')
+
+  .skill-database-mongodb         .logo
+    background-image url('/img/tech-stack-logos/databases/mongodb/mongodb-wht@2x.png')
+  .skill-database-redis           .logo
+    background-image url('/img/tech-stack-logos/databases/redis/devicons_1-8-0_redis_200_0_ffffff_none.png')
+  .skill-database-elasticsearch   .logo
+    background-image url('/img/tech-stack-logos/databases/elasticsearch/elastic/png/elasticsearch-V-white-outline@2x.png')
+  .skill-database-mysql           .logo
+    background-image url('/img/tech-stack-logos/databases/mysql/devicons_1-8-0_mysql_200_0_ffffff_none.png')
+  .skill-database-postgres        .logo
+    background-image url('/img/tech-stack-logos/databases/postgres/devicons_1-8-0_postgresql_200_0_ffffff_none.png')
+
+  .skill-cloud-amazonaws          .logo
+    background-image url('/img/tech-stack-logos/cloud-platforms/amazon-aws/amazon-aws-square-wht@2x.png')
+  .skill-cloud-googlecloud        .logo
+    background-image url('/img/tech-stack-logos/cloud-platforms/google-cloud/devicons_1-8-0_google-cloud-platform_200_0_ffffff_none.png')
+  .skill-cloud-digitalocean       .logo
+    background-image url('/img/tech-stack-logos/cloud-platforms/digital-ocean/devicons_1-8-0_digital-ocean_200_0_ffffff_none.png')
+
+  .skill-javascript-react         .logo
+    background-image url('/img/tech-stack-logos/javascript-client-libraries/react-js/devicons_1-8-0_react_200_0_ffffff_none.png')
+  .skill-javascript-angular2      .logo
+    background-image url('/img/tech-stack-logos/javascript-client-libraries/angular-js-2/devicons_1-8-0_angular_200_0_ffffff_none.png')
+
+  .skill-node-meteor              .logo
+    background-image url('/img/tech-stack-logos/nodejs-server-frameworks/meteor-js/png/meteor-horizontal-square-wht@2x.png')
+  .skill-node-express             .logo
+    background-image url('/img/tech-stack-logos/nodejs-server-frameworks/express/png/node-express-horizontal-square-wht@2x.png')
+
+  .skill-python-flask             .logo
+    background-image url('/img/tech-stack-logos/python-server-frameworks/flask/flask-horizontal-square-wht@2x.png')
+  .skill-python-django            .logo
+    background-image url('/img/tech-stack-logos/python-server-frameworks/django/devicons_1-8-0_django_200_0_ffffff_none.png')
+
+  .skill-continuousint-circleci   .logo
+    background-image url('/img/tech-stack-logos/continuous-integration-frameworks/circleci/circleci-horizontal-square-wht@2x.png')
+  .skill-continuousint-travisci   .logo
+    background-image url('/img/tech-stack-logos/continuous-integration-frameworks/travisci/devicons_1-8-0_travis_200_0_ffffff_none.png')
+
+  .skill-xcode                    .logo
+    background-image url('/img/tech-stack-logos/native-ios-xcode/xcode/xcode.svg')
+  .skill-continuousint-shenzhen   .logo
+    background-image url('/img/tech-stack-logos/native-ios-xcode/shenzhen-nomad-cli/shenzhen-nomad-cli-horizontal-square-wht@2x.png')
+
+  .skill-javascript-test-mochajs  .logo
+    background-image url('/img/tech-stack-logos/javascript-runner-frameworks/mocha-js/mochajs-icon-wht@2x.png')
+  .skill-javascript-test-cucumberjs .logo
+    background-image url('/img/tech-stack-logos/server-frameworks/ruby-on-rails/devicons_1-8-0_ruby_on_rails_200_0_ffffff_none.png')
+
+  .skill-css-sass                 .logo
+    background-image url('/img/tech-stack-logos/css-frameworks/sass/devicons_1-8-0_sass_200_0_ffffff_none.png')
+  .skill-css-stylus               .logo
+    background-image url('/img/tech-stack-logos/css-frameworks/stylus/devicons_1-8-0_stylus_200_0_ffffff_none.png')
+
+  .skill-docker                   .logo
+    background-image url('/img/tech-stack-logos/container-virtualization/docker/docker-horizontal-square-wht@2x.png')
+  .skill-ansible                  .logo
+    background-image url('/img/tech-stack-logos/python-build-tools/ansible/ansible-wht@2x.png')
+  .skill-boto                     .logo
+    background-image url('/img/tech-stack-logos/server-frameworks/nginx/devicons_1-8-0_nginx_200_0_ffffff_none.png')
 
 
 //@@
 //@ SECTION-CONTACT-CTA-01
 //@
 .section-contact-cta
+  margin-top 90vh
+  margin-bottom 90vh
+  padding-top 20vh
+  padding-bottom 20vh
+  min-height 50vh
+  border-top    solid 1px hsla(100, 100%, 100%, 0.5)
+  border-bottom solid 1px hsla(100, 100%, 100%, 0.5)
 
-  .contact-cta-01
+  &.contact-cta-01
+    margin-top 50vh
+    margin-bottom 80vh
     font-family serif
     font-size 2em
     text-transform uppercase
+
+  &.contact-cta-02
+    font-family serif
+    font-size 2em
+    text-transform uppercase
+
+
 
 
 //@@
 //@ SECTION-COMPANIES
 //@
 .section-companies
+  // margin-bottom 100vh
 
   .company
-    overflow hidden
-    text-indent -9999px
-    background-image url('')
-    background-position center center
-    background-repeat no-repeat
-    background-color hsla(0, 2%, 2%, 1)
+    margin-bottom 20px
 
-    min-height 200px
+    .logo
+      overflow hidden
+      text-indent -9999px
+      background-position center center
+      background-repeat no-repeat
+      background-color hsla(0, 0%, 100%, 0.08)
+
+      width 100%
+      min-height 200px
+      max-height 300px
+
+  .company-melodymusicapp .logo
+    background-image url('/img/companies/melodymusicapp/melodymusicapp.svg')
+  .company-unvael .logo
+    background-image url('/img/companies/unvael/unvael.svg')
+  .company-naja   .logo
+    background-image url('/img/companies/naja/naja.svg')
+  .company-pict   .logo
+    background-image url('/img/companies/pict/pict.svg')
+  .company-dropt  .logo
+    background-image url('/img/companies/dropt/dropt.svg')
+  .company-vaelproject .logo
+    background-image url('/img/companies/vaelproject/vaelproject.svg')
+  .company-broadcom .logo
+    background-image url('/img/companies/broadcom/broadcom.svg')
+  .company-sonypicturestelevision .logo
+    background-image url('/img/companies/sony/sony.svg')
+  .company-robertgraham .logo
+    background-image url('/img/companies/robertgraham/robertgraham.svg')
+  .company-behr .logo
+    background-image url('/img/companies/behr/behr.svg')
+  .company-marsfoods .logo
+    background-image url('/img/companies/marsfoods/marsfoods.svg')
+  .company-aig .logo
+    background-image url('/img/companies/aig/aig.svg')
+  .company-unicast .logo
+    background-image url('/img/companies/unicast/unicast.svg')
+  .company-medicinescompany .logo
+    background-image url('/img/companies/medicinescompany/medicinescompany.svg')
+  .company-cottagehealth .logo
+    background-image url('/img/companies/cottagehealth/cottagehealth.svg')
 
 
 
@@ -241,45 +432,79 @@ header
 //@ SECTION-PROJECTS
 //@
 .section-projects
+  margin-top 40vh
+  margin-bottom 40vh
 
   .project
+    margin-bottom 20vh
 
     .project-title
-      font-family serif
-      font-size 2em
+      margin-bottom 20px
+      // font-family serif
+      // font-size 2em
       text-transform uppercase
+      letter-spacing 0.25em
 
     .project-media
-      min-width 100%
-      min-height 300px
-      background-color hsla(0, 2%, 2%, 1)
-
-
-//@@
-//@ SECTION-CONTACT-CTA-02
-//@
-.section-contact-cta
-
-  .contact-cta-02
-    font-family serif
-    font-size 2em
-    text-transform uppercase
+      width 100%
+      min-height 80vh
+      max-height 1000px
+      background-color hsla(0, 0%, 100%, 0.08)
 
 
 //@@
 //@ SECTION-INVESTORS
 //@
 .section-investors
-
+\
   .investor
-    overflow hidden
-    text-indent -9999px
-    background-image url('')
-    background-position center center
-    background-repeat no-repeat
-    background-color hsla(0, 2%, 2%, 1)
+    margin-bottom 20px
 
-    min-height 200px
+    .logo
+      overflow hidden
+      text-indent -9999px
+      background-position center center
+      background-repeat no-repeat
+      background-color hsla(0, 0%, 100%, 0.08)
+
+      width 100%
+      min-height 200px
+      max-height 300px
+
+  .investor-angelpad             .logo
+    background-image url('/img/investors/venture-funds/angelpad/angelpad.svg')
+  .investor-opuscapital          .logo
+    background-image url('/img/investors/venture-funds/opuscapital/opuscapital.svg')
+  .investor-lowercasecapital     .logo
+    background-image url('/img/investors/venture-funds/lowercasecapital/lowercasecapital.svg')
+  .investor-forerunnerventures   .logo
+    background-image url('/img/investors/venture-funds/forerunnerventures/forerunnerventures.svg')
+  .investor-500startups          .logo
+    background-image url('/img/investors/venture-funds/500startups/500startups.svg')
+  .investor-undercurrent         .logo
+    background-image url('/img/investors/venture-funds/undercurrent/undercurrent.svg')
+  .investor-maveronventures      .logo
+    background-image url('/img/investors/venture-funds/maveronventures/maveronventures.svg')
+  .investor-frontierventures     .logo
+    background-image url('/img/investors/venture-funds/frontierventures/frontierventures.svg')
+
+  .investor-gary-vaynerchuk      .logo
+    background-image url('/img/investors/angels/gary-vaynerchuk/gary-vaynerchuk.svg')
+  .investor-adam-daugelli        .logo
+    background-image url('/img/investors/angels/adam-daugelli/adam-daugelli.svg')
+  .investor-seth-berman          .logo
+    background-image url('/img/investors/angels/seth-berman/seth-berman.svg')
+  .investor-eva-ho               .logo
+    background-image url('/img/investors/angels/eva-ho/eva-ho.svg')
+  .investor-scott-belsky         .logo
+    background-image url('/img/investors/angels/scott-belsky/scott-belsky.svg')
+  .investor-steven-alan          .logo
+    background-image url('/img/investors/angels/steven-alan/steven-alan.svg')
+  .investor-fernando-mastrangelo .logo
+    background-image url('/img/investors/angels/fernando-mastrangelo/fernando-mastrangelo.svg')
+  .investor-mark-lucovsky        .logo
+    background-image url('/img/investors/angels/mark-lucovsky/mark-lucovsky.svg')
+
 
 
   .investors.investors-venture-funds
@@ -293,3 +518,28 @@ header
     margin-bottom 20px
     padding-top 20px
     padding-bottom 20px
+
+
+.col.title-txt
+  margin-top 50px
+
+.col.sub-title-txt
+  margin-bottom 40px
+
+
+
+footer
+  min-height 80vh
+
+
+
+canvas#gregorynicholas-01
+  position absolute
+  top 0
+  bottom 0
+  left 0
+  right 0
+  z-index 1001
+
+  width 100vw
+  height 78vh
